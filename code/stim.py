@@ -8,9 +8,9 @@ For excitatory potential V_e
 """
 
 R = 7 #resistance (change) KOhms
-I = 200 #initial intensity (change) muA
+I = 500 #initial intensity (change) muA
 ALPHA = 4 #micron
-N = 10
+N = 50
 DT = 0.01
 
 
@@ -18,10 +18,10 @@ E_THRESHOLD, I_THRESHOLD = 20, 20 #mV
  
 # look up the weights
 weights = {
-    "e->e": 400,
-    "i->e": 150,
-    "e->i": 150,
-    "i->i": 50,
+    "e->e": 450,
+    "i->e": 400,
+    "e->i": 1650,
+    "i->i": 60,
 }
 
 sigma = {
@@ -37,7 +37,7 @@ def KernelConvolution(x, rho, weight, sigma, threshold=20):
 
 
 i_RANGE = arange(0, N)
-X_RANGE = arange(0, 1000)
+X_RANGE = arange(0, 4000)
 
 v_e, v_i = zeros((len(i_RANGE), len(X_RANGE))), zeros((len(i_RANGE), len(X_RANGE)))
 rho_e, rho_i = zeros(N), zeros(N)
@@ -68,40 +68,31 @@ for i in range(len(i_RANGE)-1):
 
     for index, e_potential in enumerate(v_e[i+1][:]):
         if e_potential < E_THRESHOLD:
-            rho_e[i] = X_RANGE[index]
+            rho_e[i+1] = X_RANGE[index]
             break
 
     for index, i_potential in enumerate(v_i[i+1][:]):
         if i_potential < I_THRESHOLD:
-            rho_i[i] = X_RANGE[index]
+            rho_i[i+1] = X_RANGE[index]
             break
             
     print("At Step %i: excitatory activation radius: %i inhibitory activation radius: %i"%(i, rho_e[i], rho_i[i]))
 
 
-figure, ax = plt.subplots(1, 2)
+figure, ax = plt.subplots(2, 2, figsize=(10, 8))
 
-for i in i_RANGE:
-    ax[0].plot(X_RANGE, v_e[i], label="ve[%i]"%i)
-    ax[1].plot(X_RANGE, v_i[i], label="vi[%i]"%i)
-
-# Display the plot only after all lines are plotted
-ax[0].set_title("e_potential time steps")
-ax[1].set_title("i_potential time steps")
-ax[0].set_ylabel("potential (mV)")
-ax[0].set_xlabel(r"distance ($\mu$x)"), ax[1].set_xlabel(r"distance ($\mu$x)")
-ax[0].legend(), ax[1].legend()
-plt.show()
+for i in range(0, len(i_RANGE), 10):
+    ax[0][0].plot(X_RANGE, v_e[i], label="ve[%i]"%i)
+    ax[0][1].plot(X_RANGE, v_i[i], label="vi[%i]"%i)
 
 
-# Debug Plot
-for i in i_RANGE:
-    plt.plot(X_RANGE, ee_erf[i], label=f"ee[{i}]")
-    plt.plot(X_RANGE, ie_erf[i], label=f"ie[{i}]")
-    
+ax[1][0].plot(i_RANGE, rho_e)
+ax[1][1].plot(i_RANGE, rho_i)
 
-plt.title("k_conv over Time")
-plt.xlabel(r"Distance ($\mu$x)")
-plt.ylabel("k_conv values")
-plt.legend()
+ax[0][0].set_title("e_potential time steps"), ax[0][1].set_title("i_potential time steps")
+ax[1][0].set_title("e_rho"), ax[1][1].set_title("i_rho")
+ax[0][0].set_ylabel("potential (mV)")
+ax[0][0].set_xlabel(r"distance ($\mu$x)"), ax[0][1].set_xlabel(r"distance ($\mu$x)")
+ax[0][0].legend(), ax[0][1].legend()
+plt.tight_layout()
 plt.show()
