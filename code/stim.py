@@ -52,7 +52,7 @@ rho_e[0] = R*I/E_THRESHOLD - ALPHA
 v_e[0][:] = R*I/(X_RANGE + ALPHA) #1/sqrt(x)
 v_i[0][:] = R*I/(X_RANGE + ALPHA)
 
-"""
+"""  
 kernal convolution array
 """
 ee_erf, ie_erf = zeros((len(i_RANGE), len(X_RANGE))), zeros((len(i_RANGE), len(X_RANGE)))
