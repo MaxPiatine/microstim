@@ -60,7 +60,7 @@ def microstim(intensity, weights, sigma, e_amp=1, i_amp=1, max_v=True):
                 i_thresh.append(distance)
             
         rho_e[i+1], rho_i[i+1] = max(e_thresh, default=0), max(i_thresh, default=0)
-        print("At Step %i: excitatory activation radius: %i microns inhibitory activation radius: %i microns"%(i+1, rho_e[i+1], rho_i[i+1]))
+        # print("At Step %i: excitatory activation radius: %i microns inhibitory activation radius: %i microns"%(i+1, rho_e[i+1], rho_i[i+1]))
 
     if max_v:
         v_e = np.clip(v_e, -20, 20)
@@ -97,7 +97,7 @@ if __name__ == "__main__":
     }
 
 
-    figure, ax = plt.subplots(1, 3)
+    _, ax = plt.subplots(1, 3)
 
     # amp
     rho_e, rho_i, v_e, v_i = microstim(intensity, amp_weights, sigma, e_amp=1, i_amp=0.5)
@@ -128,3 +128,21 @@ if __name__ == "__main__":
 
     plt.tight_layout()
     plt.show()
+
+    # heatmap
+
+    Wei_RANGE = np.arange(100, 300, 1)
+    inh_RANGE = np.arange(0, 200, 1)
+    heatmap = np.zeros((len(Wei_RANGE), len(inh_RANGE)))
+
+    for x, W_ei in enumerate(Wei_RANGE):
+        weights["e->i"] = W_ei
+        print(x)
+        for y, direct_inh in enumerate(inh_RANGE):
+            rho_e, rho_i, v_e, v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=direct_inh/100)
+            heatmap[x][y] += max(rho_e)
+
+    plt.imshow(heatmap)
+    plt.colorbar()
+    plt.show()
+
