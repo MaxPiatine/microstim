@@ -21,10 +21,13 @@ def plot(x, t, i_steps, step, e_radius, i_radius, v_e, v_i):
 
 
     # row2
-    ax[1][0].plot(i_steps, e_radius)
-    ax[1][1].plot(i_steps, i_radius)
+    ax[1][0].plot(t, e_radius)
+    ax[1][1].plot(t, i_radius)
 
     ax[1][0].set_title("e_rho"), ax[1][1].set_title("i_rho")
+
+    ax[1][0].set_xlabel("normalized time"), ax[2][1].set_xlabel("normalized time")
+    ax[1][0].set_ylabel(r"radius ($\mu$m)")
 
 
     # row3
