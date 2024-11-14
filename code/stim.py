@@ -142,7 +142,12 @@ if __name__ == "__main__":
             rho_e, rho_i, v_e, v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=direct_inh/100)
             heatmap[x][y] += max(rho_e)
 
-    plt.imshow(heatmap)
+    x_ticks = np.arange(0, heatmap.shape[1], step=10)  # Change step as needed
+    x_labels = x_ticks / 100  # Divide tick labels by 100
+
+    plt.xticks(ticks=x_ticks, labels=x_labels)
+    plt.xlabel("X Axis (divided by 100)")
+    plt.imshow(heatmap, origin="lower", cmap='RdBu')
     plt.colorbar()
     plt.show()
 
