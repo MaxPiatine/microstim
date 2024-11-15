@@ -11,7 +11,7 @@ def KernelConvolution(x, rho, weight, sigma):
     return weight * ( erf( (x + rho) / (sqrt(2) * sigma) ) - erf( (x - rho) / (sqrt(2) * sigma) ) ) * 0.5
 
 
-def microstim(intensity, weights, sigma, e_amp=1, i_amp=1, max_v=True):
+def microstim(intensity, weights, sigma, e_amp=0, i_amp=0, max_v=True):
     rho_e, rho_i = np.zeros(N), np.zeros(N)
 
     v_e, v_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
