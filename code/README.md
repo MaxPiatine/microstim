@@ -1,3 +1,5 @@
-![alt text](graphs.png)
+transient.py belongs to Richard Naud
 
-![alt text](desc.png)
+![alt text](images/graphs.png)
+
+![alt text](images/desc.png)

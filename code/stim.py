@@ -2,18 +2,9 @@ from math import sqrt
 from scipy.special import erf
 import matplotlib.pyplot as plt
 import numpy as np
-# from plot import plot
 
-N = 1000
+from globals import N, i_RANGE, X_RANGE, THRESHOLD, ALPHA, DT, R
 
-R = 7 #resistance (change) KOhms
-ALPHA = 4 #micron
-DT = 0.01
-
-THRESHOLD = 20 #mV
-
-i_RANGE = np.arange(0, N) #steps
-X_RANGE = np.arange(0, 1000)
 
 
 def KernelConvolution(x, rho, weight, sigma):
@@ -69,85 +60,4 @@ def microstim(intensity, weights, sigma, e_amp=1, i_amp=1, max_v=True):
     return rho_e, rho_i, v_e, v_i
 
 
-if __name__ == "__main__":
-    T = N * DT
-    intensity = 500
-
-    T_RANGE = np.arange(0, T, T/N)
-
-    sigma = {
-        "ee": 120,
-        "ie": 120,
-        "ei": 120,
-        "ii": 120,
-    } #microns
-
-    weights = {
-        "e->e": 150,
-        "i->e": 150,
-        "e->i": 150,
-        "i->i": 150,
-    }
-
-    amp_weights = {
-        "e->e": 100,
-        "i->e": 100,
-        "e->i": 150,
-        "i->i": 0,
-    }
-
-
-    _, ax = plt.subplots(1, 3)
-
-    # amp
-    rho_e, rho_i, v_e, v_i = microstim(intensity, amp_weights, sigma, e_amp=1, i_amp=0.5)
-
-    # no amp
-    no_rho_e, no_rho_i, no_v_e, no_v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=1)
-
-    ax[0].plot(T_RANGE, no_rho_e, label="no amp.")
-    ax[0].plot(T_RANGE, rho_e, label="amp. exc.")
-    ax[0].plot(T_RANGE, rho_i, label="amp. inh.")
-    ax[0].set_xlabel("normalized time")
-    ax[0].set_ylabel(r"radius [$\mu$m]")
-    ax[0].legend()
-
-    ax[1].plot(X_RANGE, no_v_e[:, 100], label="no amp.")
-    ax[1].plot(X_RANGE, v_e[:, 100], label="amp. exc.")
-    ax[1].plot(X_RANGE, v_i[:, 100], label="amp inh.")
-    ax[1].set_xlabel(r"distance [$\mu$m]")
-    ax[1].set_ylabel("max. pot. [mV]")
-    ax[1].legend()
-
-    ax[2].plot(T_RANGE, np.max(no_v_e, axis=1), label="no amp.")
-    ax[2].plot(T_RANGE, np.max(v_e, axis=1), label="amp. exc.")
-    ax[2].plot(T_RANGE, np.max(v_i, axis=1), label="amp inh.")
-    ax[2].set_xlabel("normalized time")
-    ax[2].set_ylabel("max. pot. [mV]")
-    ax[2].legend()
-
-    plt.tight_layout()
-    plt.show()
-
-    # heatmap
-
-    Wei_RANGE = np.arange(100, 300, 1)
-    inh_RANGE = np.arange(0, 200, 1)
-    heatmap = np.zeros((len(Wei_RANGE), len(inh_RANGE)))
-
-    for x, W_ei in enumerate(Wei_RANGE):
-        weights["e->i"] = W_ei
-        print(x)
-        for y, direct_inh in enumerate(inh_RANGE):
-            rho_e, rho_i, v_e, v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=direct_inh/100)
-            heatmap[x][y] += max(rho_e)
-
-    x_ticks = np.arange(0, heatmap.shape[1], step=10)  # Change step as needed
-    x_labels = x_ticks / 100  # Divide tick labels by 100
-
-    plt.xticks(ticks=x_ticks, labels=x_labels)
-    plt.xlabel("X Axis (divided by 100)")
-    plt.imshow(heatmap, origin="lower", cmap='RdBu')
-    plt.colorbar()
-    plt.show()
 
