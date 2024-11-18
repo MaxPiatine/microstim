@@ -15,7 +15,7 @@ for x, W_ei in enumerate(Wei_RANGE):
     print(x)
     for y, direct_inh in enumerate(inh_RANGE):
         rho_e, rho_i, v_e, v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=direct_inh/100)
-        heatmap[x][y] += max(rho_e)
+        heatmap[x][y] += max(rho_i)
 
 
 plt.imshow(heatmap, origin="lower", cmap='plasma', interpolation="nearest", aspect="auto")
