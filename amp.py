@@ -5,7 +5,7 @@ from globals import X_RANGE, T_RANGE, intensity, sigma, weights
 from stim import microstim
 
 # no amp
-no_rho_e, no_rho_i, no_v_e, no_v_i = microstim(intensity, weights, sigma)
+no_rho_e, no_rho_i, no_v_e, no_v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=1)
 
 # amp
 weights["e->i"], weights["i->i"] = 150, 0
