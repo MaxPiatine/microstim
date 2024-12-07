@@ -1,3 +1,3 @@
-![alt text](images/graphs.png)
+![alt text](assets/graphs.png)
 
-![alt text](images/desc.png)
+![alt text](assets/desc.png)
