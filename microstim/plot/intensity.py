@@ -1,8 +1,8 @@
 import matplotlib.pylab as plt
 import numpy as np
 
-from stim import microstim
-from globals import intensity, weights, sigma, N
+from microstim.stim import microstim
+from microstim.globals import intensity, weights, sigma, N
 
 intensity_RANGE = np.arange(0, intensity, intensity/N)
 

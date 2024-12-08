@@ -1,3 +1,7 @@
+"""
+Author: Richard Naud
+"""
+
 from math import erf
 from numpy import arange, zeros, where, transpose, array, argmin
 

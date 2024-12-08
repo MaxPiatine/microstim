@@ -1,8 +1,8 @@
 import matplotlib.pylab as plt
 import numpy as np
 
-from globals import X_RANGE, T_RANGE, intensity, sigma, weights
-from stim import microstim
+from microstim.globals import X_RANGE, T_RANGE, intensity, sigma, weights
+from microstim.stim import microstim
 
 # unstable
 weights["e->i"], weights["i->i"] = 125, 100
