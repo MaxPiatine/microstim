@@ -1,3 +1,3 @@
-![alt text](assets/graphs.png)
-
-![alt text](assets/desc.png)
+```python 
+python3 -m microstim.plot.{foo.py}
+```
