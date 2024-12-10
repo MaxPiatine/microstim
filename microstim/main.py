@@ -26,8 +26,8 @@ def microstim(intensity, weights, sigma, e_amp=0, i_amp=0, max_v=True):
     rho_i[0] = (R*intensity/THRESHOLD - ALPHA) * i_amp
 
     # direct stimulation
-    v_e[0] = R*intensity/(X_RANGE + ALPHA) * e_amp #1/sqrt(x)
-    v_i[0] = R*intensity/(X_RANGE + ALPHA) * i_amp #1/sqrt(x)
+    v_e[0] = R*intensity/(X_RANGE + ALPHA)**2 * e_amp #1/sqrt(x)
+    v_i[0] = R*intensity/(X_RANGE + ALPHA)**2 * i_amp #1/sqrt(x)
     
     # kernal arrays
     ee, ie, ei, ii = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))

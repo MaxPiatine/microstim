@@ -1,7 +1,7 @@
 import matplotlib.pylab as plt
 import numpy as np
 
-from stim import microstim
+from microstim.main import microstim
 from globals import weights, sigma, intensity
 
 

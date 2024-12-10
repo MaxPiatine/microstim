@@ -2,7 +2,7 @@ import matplotlib.pylab as plt
 import numpy as np
 
 from microstim.globals import X_RANGE, T_RANGE, intensity, sigma, weights
-from microstim.stim import microstim
+from microstim.main import microstim
 
 # unstable
 weights["e->i"], weights["i->i"] = 125, 100

@@ -2,7 +2,7 @@ import matplotlib.pylab as plt
 import numpy as np
 
 from microstim.globals import X_RANGE, T_RANGE, intensity, sigma, weights
-from microstim.stim import microstim
+from microstim.main import microstim
 
 # no amp
 no_rho_e, no_rho_i, no_v_e, no_v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=1)
