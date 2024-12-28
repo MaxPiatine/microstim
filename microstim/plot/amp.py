@@ -1,15 +1,16 @@
 import matplotlib.pylab as plt
 import numpy as np
 
-from microstim.globals import X_RANGE, T_RANGE, intensity, sigma, weights
+from microstim.globals import X_RANGE, T_RANGE, intensity, sigma, weights, start_boost
 from microstim.main import microstim
 
 # no amp
-no_rho_e, no_rho_i, no_v_e, no_v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=1)
+no_rho_e, no_rho_i, no_v_e, no_v_i = microstim(intensity, weights, sigma, start_boost)
 
 # amp
 weights["e->i"], weights["i->i"] = 150, 0
-rho_e, rho_i, v_e, v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=0.5)
+start_boost["inh"] = 0.5
+rho_e, rho_i, v_e, v_i = microstim(intensity, weights, sigma, start_boost)
 
 
 # plots

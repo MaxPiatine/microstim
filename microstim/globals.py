@@ -16,6 +16,9 @@ intensity = 500
 
 T_RANGE = np.arange(0, T, T/N)
 
+# Power Law
+P = 2
+
 sigma = {
         "ee": 120,
         "ie": 120,
@@ -29,3 +32,8 @@ weights = {
         "e->i": 150,
         "i->i": 150,
     }
+
+start_boost = {
+    "exc": 1,
+    "inh": 1,
+}
