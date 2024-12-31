@@ -17,7 +17,7 @@ intensity = 500
 T_RANGE = np.arange(0, T, T/N)
 
 # Power Law
-P = 2
+P = 1
 
 sigma = {
         "ee": 120,

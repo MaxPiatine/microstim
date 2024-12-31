@@ -8,8 +8,7 @@ from microstim.main import microstim
 no_rho_e, no_rho_i, no_v_e, no_v_i = microstim(intensity, weights, sigma, start_boost)
 
 # amp
-weights["e->i"], weights["i->i"] = 150, 0
-start_boost["inh"] = 0.5
+weights["e->i"], weights["i->i"], start_boost["inh"] = 200, 0, 0.5
 rho_e, rho_i, v_e, v_i = microstim(intensity, weights, sigma, start_boost)
 
 
@@ -20,19 +19,20 @@ ax[0].plot(T_RANGE, no_rho_e, label="no amp.")
 ax[0].plot(T_RANGE, rho_e, label="amp. exc.")
 ax[0].plot(T_RANGE, rho_i, label="amp. inh.")
 ax[0].set_xlabel("normalized time")
+ax[0].set_xlim([0,3])
 ax[0].set_ylabel(r"radius [$\mu$m]")
 ax[0].legend()
 
-ax[1].plot(X_RANGE, no_v_e[:, 100], label="no amp.")
-ax[1].plot(X_RANGE, v_e[:, 100], label="amp. exc.")
-ax[1].plot(X_RANGE, v_i[:, 100], label="amp inh.")
+ax[1].plot(X_RANGE, np.clip(no_v_e[:, 100], -20, 20), label="no amp.")
+ax[1].plot(X_RANGE, np.clip(v_e[:, 100], -20, 20), label="amp. exc.")
+ax[1].plot(X_RANGE, np.clip(v_i[:, 100], -20, 20), label="amp inh.")
 ax[1].set_xlabel(r"distance [$\mu$m]")
 ax[1].set_ylabel("max. pot. [mV]")
 ax[1].legend()
 
-ax[2].plot(T_RANGE, np.max(no_v_e, axis=1), label="no amp.")
-ax[2].plot(T_RANGE, np.max(v_e, axis=1), label="amp. exc.")
-ax[2].plot(T_RANGE, np.max(v_i, axis=1), label="amp inh.")
+ax[2].plot(T_RANGE, np.clip(np.max(no_v_e, axis=1), -20, 20), label="no amp.")
+ax[2].plot(T_RANGE, np.clip(np.max(v_e, axis=1), -20, 20), label="amp. exc.")
+ax[2].plot(T_RANGE, np.clip(np.max(v_i, axis=1), -20, 20), label="amp inh.")
 ax[2].set_xlabel("normalized time")
 ax[2].set_ylabel("max. pot. [mV]")
 ax[2].legend()
