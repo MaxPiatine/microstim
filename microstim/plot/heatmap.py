@@ -1,8 +1,8 @@
 import matplotlib.pylab as plt
 import numpy as np
 
-from microstim.main import microstim
-from globals import weights, sigma, intensity
+from microstim.main import depolarizationModel
+from globals import weights, sigma, intensity, start_boost
 
 
 # heatmap
@@ -14,7 +14,8 @@ for x, W_ei in enumerate(Wei_RANGE):
     weights["e->i"] = W_ei
     print(x)
     for y, direct_inh in enumerate(inh_RANGE):
-        rho_e, rho_i, v_e, v_i = microstim(intensity, weights, sigma, e_amp=1, i_amp=direct_inh/100)
+        start_boost["inh"] = direct_inh/100
+        rho_e, rho_i, v_e, v_i = depolarizationModel(intensity, weights, sigma, start_boost)
         heatmap[x][y] += max(rho_i)
 
 

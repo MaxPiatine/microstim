@@ -12,7 +12,7 @@ i_RANGE = np.arange(0, N) #steps
 X_RANGE = np.arange(0, 1000)
 
 T = N * DT
-intensity = 500
+intensity = 300
 
 T_RANGE = np.arange(0, T, T/N)
 

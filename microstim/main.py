@@ -19,19 +19,41 @@ def activationRadius(ve, vi):
     
     return max(e_thresh, default=0), max(i_thresh, default=0)
 
-def microstim(intensity, weights, sigma, start_boost, depolarization=True, max_v=True):
+def depolarizationModel(intensity, weights, sigma, start_boost):
     rho_e, rho_i = np.zeros(N), np.zeros(N)
     v_e, v_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
 
-    if depolarization:
-        print("depolarization model")
-        v_e[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["exc"]
-        v_i[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["inh"]
-    else:
-        print("activation model")
-        
-    rho_e[0], rho_i[0] = activationRadius(v_e[0], v_i[0])
+    v_e[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["exc"]
+    v_i[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["inh"]
 
+    rho_e[0], rho_i[0] = activationRadius(v_e[0], v_i[0])
+    
+    # kernal arrays
+    ee, ie, ei, ii = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
+
+    for i in range(0, len(i_RANGE)-1):
+
+        ee[i] = KernelConvolution(rho_e[i], weights["e->e"], sigma["ee"]) 
+        ie[i] = KernelConvolution(rho_i[i], weights["i->e"], sigma["ie"])
+        ei[i] = KernelConvolution(rho_e[i], weights["e->i"], sigma["ei"])
+        ii[i] = KernelConvolution(rho_i[i], weights["i->i"], sigma["ii"])
+        
+        v_e[i+1] = v_e[i] + DT * (-v_e[i] + ee[i] - ie[i])
+        
+        v_i[i+1] = v_i[i] + DT * (-v_i[i] + ei[i] - ii[i])
+        
+        rho_e[i+1], rho_i[i+1] = activationRadius(v_e[i+1], v_i[i+1])
+
+    return rho_e, rho_i, v_e, v_i
+
+def activationModel(intensity, weights, sigma, start_boost):
+    rho_e, rho_i = np.zeros(N), np.zeros(N)
+    v_e, v_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
+
+    v_e[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["exc"]
+    v_i[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["inh"]
+
+    rho_e[0], rho_i[0] = activationRadius(v_e[0], v_i[0])
     
     # kernal arrays
     ee, ie, ei, ii = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
