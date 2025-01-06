@@ -4,6 +4,7 @@ N = 1000
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
+BETA = 1
 DT = 0.01
 
 THRESHOLD = 20 #mV
@@ -12,7 +13,7 @@ i_RANGE = np.arange(0, N) #steps
 X_RANGE = np.arange(0, 1000)
 
 T = N * DT
-intensity = 300
+intensity = 500 #mA
 
 T_RANGE = np.arange(0, T, T/N)
 

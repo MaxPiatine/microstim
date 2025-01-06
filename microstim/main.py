@@ -9,7 +9,7 @@ from microstim.globals import N, i_RANGE, X_RANGE, THRESHOLD, ALPHA, DT, R, P
 def KernelConvolution(rho, weight, sigma):
     return weight * ( erf( (X_RANGE + rho) / (sqrt(2) * sigma) ) - erf( (X_RANGE - rho) / (sqrt(2) * sigma) ) ) * 0.5
 
-def activationRadius(ve, vi):
+def ephapticCoupling(ve, vi):
     e_thresh, i_thresh = [], []
     for distance, e_pot, i_pot in zip(X_RANGE, ve, vi):
         if e_pot > THRESHOLD:
@@ -26,7 +26,7 @@ def depolarizationModel(intensity, weights, sigma, start_boost):
     v_e[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["exc"]
     v_i[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["inh"]
 
-    rho_e[0], rho_i[0] = activationRadius(v_e[0], v_i[0])
+    rho_e[0], rho_i[0] = ephapticCoupling(v_e[0], v_i[0])
     
     # kernal arrays
     ee, ie, ei, ii = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
@@ -42,33 +42,33 @@ def depolarizationModel(intensity, weights, sigma, start_boost):
         
         v_i[i+1] = v_i[i] + DT * (-v_i[i] + ei[i] - ii[i])
         
-        rho_e[i+1], rho_i[i+1] = activationRadius(v_e[i+1], v_i[i+1])
+        rho_e[i+1], rho_i[i+1] = ephapticCoupling(v_e[i+1], v_i[i+1])
 
     return rho_e, rho_i, v_e, v_i
+
+def activationRadius(intensity, start_boost):
+    return ALPHA * intensity**(1/P) * start_boost
 
 def activationModel(intensity, weights, sigma, start_boost):
     rho_e, rho_i = np.zeros(N), np.zeros(N)
     v_e, v_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
-
-    v_e[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["exc"]
-    v_i[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["inh"]
-
-    rho_e[0], rho_i[0] = activationRadius(v_e[0], v_i[0])
+    
+    rho_e[0], rho_i[0] = activationRadius(intensity, start_boost["exc"]), activationRadius(intensity, start_boost["inh"])
+    print(rho_e[0])
     
     # kernal arrays
     ee, ie, ei, ii = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
 
     for i in range(0, len(i_RANGE)-1):
-
-        ee[i] = KernelConvolution(rho_e[i], weights["e->e"], sigma["ee"]) 
-        ie[i] = KernelConvolution(rho_i[i], weights["i->e"], sigma["ie"])
-        ei[i] = KernelConvolution(rho_e[i], weights["e->i"], sigma["ei"])
-        ii[i] = KernelConvolution(rho_i[i], weights["i->i"], sigma["ii"])
+        ee[i] = KernelConvolution(rho_e[i], weights["e->e"], sigma["ee"]) * np.log(intensity)
+        ie[i] = KernelConvolution(rho_i[i], weights["i->e"], sigma["ie"]) * np.log(intensity)
+        ei[i] = KernelConvolution(rho_e[i], weights["e->i"], sigma["ei"]) * np.log(intensity)
+        ii[i] = KernelConvolution(rho_i[i], weights["i->i"], sigma["ii"]) * np.log(intensity)
         
-        v_e[i+1] = v_e[i] + DT * (-v_e[i] + ee[i] - ie[i])
+        v_e[i+1] = (v_e[i] + DT * (-v_e[i] + ee[i] - ie[i])) 
         
-        v_i[i+1] = v_i[i] + DT * (-v_i[i] + ei[i] - ii[i])
+        v_i[i+1] = (v_i[i] + DT * (-v_i[i] + ei[i] - ii[i])) 
         
-        rho_e[i+1], rho_i[i+1] = activationRadius(v_e[i+1], v_i[i+1])
+        rho_e[i], rho_i[i] = ephapticCoupling(v_e[i+1], v_i[i+1])
 
     return rho_e, rho_i, v_e, v_i

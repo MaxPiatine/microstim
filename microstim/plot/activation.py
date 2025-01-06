@@ -1,15 +1,15 @@
-import matplotlib.pylab as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
-from microstim.globals import X_RANGE, T_RANGE, intensity, sigma, weights, start_boost
-from microstim.main import depolarizationModel
+from microstim.globals import X_RANGE, intensity, start_boost, weights, sigma, T_RANGE
+from microstim.main import activationModel
 
 # no amp
-no_rho_e, no_rho_i, no_v_e, no_v_i = depolarizationModel(intensity, weights, sigma, start_boost)
+no_rho_e, no_rho_i, no_v_e, no_v_i = activationModel(intensity, weights, sigma, start_boost)
 
 # amp
 weights["e->i"], weights["i->i"], start_boost["inh"] = 200, 100, 0.5
-rho_e, rho_i, v_e, v_i = depolarizationModel(intensity, weights, sigma, start_boost)
+rho_e, rho_i, v_e, v_i = activationModel(intensity, weights, sigma, start_boost)
 
 
 # plots
@@ -30,12 +30,12 @@ ax[1].set_xlabel(r"distance [$\mu$m]")
 ax[1].set_ylabel("max. pot. [mV]")
 ax[1].legend()
 
-ax[2].plot(T_RANGE, np.clip(np.max(no_v_e, axis=1), -20, 20), label="no amp.")
-ax[2].plot(T_RANGE, np.clip(np.max(v_e, axis=1), -20, 20), label="amp. exc.")
-ax[2].plot(T_RANGE, np.clip(np.max(v_i, axis=1), -20, 20), label="amp inh.")
-ax[2].set_xlabel("normalized time")
-ax[2].set_ylabel("max. pot. [mV]")
-ax[2].legend()
+# ax[2].plot(T_RANGE, np.clip(np.max(no_v_e, axis=1), -20, 20), label="no amp.")
+# ax[2].plot(T_RANGE, np.clip(np.max(v_e, axis=1), -20, 20), label="amp. exc.")
+# ax[2].plot(T_RANGE, np.clip(np.max(v_i, axis=1), -20, 20), label="amp inh.")
+# ax[2].set_xlabel("normalized time")
+# ax[2].set_ylabel("max. pot. [mV]")
+# ax[2].legend()
 
 plt.tight_layout()
 plt.show()
