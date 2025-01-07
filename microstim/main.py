@@ -47,14 +47,14 @@ def depolarizationModel(intensity, weights, sigma, start_boost):
     return rho_e, rho_i, v_e, v_i
 
 def activationRadius(intensity, start_boost):
-    return ALPHA * intensity**(1/P) * start_boost
+    r_o = ALPHA * intensity**(1/P)
+    return np.where(np.abs(X_RANGE) <= r_o * start_boost, 1, 0)
 
 def activationModel(intensity, weights, sigma, start_boost):
-    rho_e, rho_i = np.zeros(N), np.zeros(N)
+    rho_e, rho_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
     v_e, v_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
     
     rho_e[0], rho_i[0] = activationRadius(intensity, start_boost["exc"]), activationRadius(intensity, start_boost["inh"])
-    print(rho_e[0])
     
     # kernal arrays
     ee, ie, ei, ii = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))

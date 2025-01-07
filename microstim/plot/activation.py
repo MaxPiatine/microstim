@@ -15,9 +15,10 @@ rho_e, rho_i, v_e, v_i = activationModel(intensity, weights, sigma, start_boost)
 # plots
 _, ax = plt.subplots(1, 3)
 
-ax[0].plot(T_RANGE, no_rho_e, label="no amp.")
-ax[0].plot(T_RANGE, rho_e, label="amp. exc.")
-ax[0].plot(T_RANGE, rho_i, label="amp. inh.")
+for i in range(0, len(X_RANGE)-1, 200):
+    ax[0].plot(X_RANGE, no_rho_e[i], label="no amp.")
+    ax[0].plot(X_RANGE, rho_e[i], label="amp. exc.")
+    ax[0].plot(X_RANGE, rho_i[i], label="amp. inh.")
 ax[0].set_xlabel("normalized time")
 ax[0].set_xlim([0,3])
 ax[0].set_ylabel(r"radius [$\mu$m]")
