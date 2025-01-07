@@ -16,20 +16,13 @@ rho_e, rho_i, v_e, v_i = activationModel(intensity, weights, sigma, start_boost)
 _, ax = plt.subplots(1, 3)
 
 for i in range(0, len(X_RANGE)-1, 200):
-    ax[0].plot(X_RANGE, no_rho_e[i], label="no amp.")
+    # ax[0].plot(X_RANGE, no_rho_e[i], label="no amp.")
     ax[0].plot(X_RANGE, rho_e[i], label="amp. exc.")
-    ax[0].plot(X_RANGE, rho_i[i], label="amp. inh.")
-ax[0].set_xlabel("normalized time")
-ax[0].set_xlim([0,3])
-ax[0].set_ylabel(r"radius [$\mu$m]")
-ax[0].legend()
+    # ax[0].plot(X_RANGE, rho_i[i], label="amp. inh.")
 
-ax[1].plot(X_RANGE, np.clip(no_v_e[:, 100], -20, 20), label="no amp.")
-ax[1].plot(X_RANGE, np.clip(v_e[:, 100], -20, 20), label="amp. exc.")
-ax[1].plot(X_RANGE, np.clip(v_i[:, 100], -20, 20), label="amp inh.")
-ax[1].set_xlabel(r"distance [$\mu$m]")
-ax[1].set_ylabel("max. pot. [mV]")
-ax[1].legend()
+    # ax[1].plot(X_RANGE, np.clip(no_v_e[i], -20, 20), label="no amp.")
+    ax[1].plot(X_RANGE, np.clip(v_e[i], -20, 20), label="amp. exc.")
+    # ax[1].plot(X_RANGE, np.clip(v_i[i], -20, 20), label="amp inh.")
 
 # ax[2].plot(T_RANGE, np.clip(np.max(no_v_e, axis=1), -20, 20), label="no amp.")
 # ax[2].plot(T_RANGE, np.clip(np.max(v_e, axis=1), -20, 20), label="amp. exc.")
@@ -37,6 +30,14 @@ ax[1].legend()
 # ax[2].set_xlabel("normalized time")
 # ax[2].set_ylabel("max. pot. [mV]")
 # ax[2].legend()
+
+
+ax[0].set_ylabel(r"radius [$\mu$m]")
+ax[0].legend()
+
+ax[1].set_xlabel(r"distance [$\mu$m]")
+ax[1].set_ylabel("max. pot. [mV]")
+ax[1].legend()
 
 plt.tight_layout()
 plt.show()
