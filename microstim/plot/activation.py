@@ -5,24 +5,33 @@ from microstim.globals import X_RANGE, intensity, start_boost, weights, sigma, T
 from microstim.main import activationModel
 
 # no amp
-no_rho_e, no_rho_i, no_v_e, no_v_i = activationModel(intensity, weights, sigma, start_boost)
+# no_rho_e, no_rho_i, no_v_e, no_v_i = activationModel(intensity, weights, sigma, start_boost)
 
 # amp
-weights["e->i"], weights["i->i"], start_boost["inh"] = 200, 100, 0.5
-rho_e, rho_i, v_e, v_i = activationModel(intensity, weights, sigma, start_boost)
+weights = {
+        "e->e": 150,
+        "i->e": 100,
+        "e->i": 200,
+        "i->i": 50,
+    }
+gamma = {
+    "exc": 10000,
+    "inh": 1000,
+}
+rho_e, rho_i, v_e, v_i = activationModel(intensity, weights, sigma, gamma, start_boost)
 
 
 # plots
-_, ax = plt.subplots(1, 3)
+_, ax = plt.subplots(1, 2)
 
+ax[0].plot(X_RANGE, rho_e, label="amp. exc.")
 for i in range(0, len(X_RANGE)-1, 200):
     # ax[0].plot(X_RANGE, no_rho_e[i], label="no amp.")
-    ax[0].plot(X_RANGE, rho_e[i], label="amp. exc.")
     # ax[0].plot(X_RANGE, rho_i[i], label="amp. inh.")
 
     # ax[1].plot(X_RANGE, np.clip(no_v_e[i], -20, 20), label="no amp.")
     ax[1].plot(X_RANGE, np.clip(v_e[i], -20, 20), label="amp. exc.")
-    # ax[1].plot(X_RANGE, np.clip(v_i[i], -20, 20), label="amp inh.")
+    ax[1].plot(X_RANGE, np.clip(v_i[i], -20, 20), label="amp inh.")
 
 # ax[2].plot(T_RANGE, np.clip(np.max(no_v_e, axis=1), -20, 20), label="no amp.")
 # ax[2].plot(T_RANGE, np.clip(np.max(v_e, axis=1), -20, 20), label="amp. exc.")
