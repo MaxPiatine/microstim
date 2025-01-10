@@ -38,3 +38,8 @@ start_boost = {
     "exc": 1,
     "inh": 1,
 }
+
+gamma = {
+    "exc": 1,
+    "inh": 1,
+}
