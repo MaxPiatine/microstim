@@ -28,9 +28,9 @@ sigma = {
     } #microns
 
 weights = {
-        "e->e": 150,
+        "e->e": 200,
         "i->e": 150,
-        "e->i": 150,
+        "e->i": 100,
         "i->i": 150,
     }
 
@@ -40,6 +40,6 @@ start_boost = {
 }
 
 gamma = {
-    "exc": 1,
-    "inh": 1,
+    "exc": 10**10,
+    "inh": 10,
 }

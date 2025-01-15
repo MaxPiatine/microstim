@@ -1,5 +1,6 @@
 from math import sqrt
 from scipy.special import erf
+import matplotlib.pylab as plt
 import numpy as np
 
 from microstim.globals import N, i_RANGE, X_RANGE, THRESHOLD, ALPHA, DT, R, P
@@ -49,34 +50,45 @@ def depolarizationModel(intensity, weights, sigma, start_boost):
     return rho_e, rho_i, v_e, v_i
     
 
-def activationModel(intensity, weights, sigma, gamma, start_boost):
-    rho_e, rho_i = np.zeros(N), np.zeros(N)
+def normal(sigma):
+    return np.exp(-X_RANGE**2/(2 * sigma**2)) / (2 * np.pi * sigma**2)
+
+def sigmoid(v):
+    return np.where(v >= 0, 1 / (1 + np.exp(-(THRESHOLD - v))), np.exp(THRESHOLD - v) / (1 + np.exp(THRESHOLD - v)))
+
+def activationModel(intensity, weights, sigma, gamma):
+    nu_e, nu_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
     v_e, v_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
 
-    # v_e[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["exc"]
-    # v_i[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["inh"]
-    
-    # kernal arrays
-    ee, ie, ei, ii = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
+    nu_e[0] = np.log(intensity) * gamma["exc"] * normal(sigma=150)
+    nu_i[0] = np.log(intensity) * gamma["inh"] * normal(sigma=100)
+
+    wee = weights["e->e"] * normal(sigma["ee"])
+    wie = weights["i->e"] * normal(sigma["ie"])
+    wei = weights["e->i"] * normal(sigma["ei"])
+    wii = weights["i->i"] * normal(sigma["ii"])
     
     for i in range(0, len(i_RANGE)-1):
-        if i == 0:
-            # should not have 0 potential at the start
-            ee[i] = kernalExp(intensity, weights["e->e"], sigma["ee"], gamma["exc"])
-            ie[i] = kernalExp(intensity, weights["i->e"], sigma["ie"], gamma["inh"])
-            ei[i] = kernalExp(intensity, weights["e->i"], sigma["ei"], gamma["exc"])
-            ii[i] = kernalExp(intensity, weights["i->i"], sigma["ii"], gamma["inh"])
-        else:
-            ee[i] = KernelConvolution(rho_e[i], weights["e->e"], sigma["ee"]) 
-            ie[i] = KernelConvolution(rho_i[i], weights["i->e"], sigma["ie"]) 
-            ei[i] = KernelConvolution(rho_e[i], weights["e->i"], sigma["ei"]) 
-            ii[i] = KernelConvolution(rho_i[i], weights["i->i"], sigma["ii"]) 
 
-        v_e[i+1] = v_e[i] + DT * (-v_e[i] + ee[i] - ie[i])
+        v_e[i+1] = v_e[i] + DT * (-v_e[i] + np.convolve(wee, nu_e[i], mode="same") - np.convolve(wie, nu_i[i], mode="same"))
+        v_i[i+1] = v_i[i] + DT * (-v_i[i] + np.convolve(wei, nu_e[i], mode="same") - np.convolve(wii, nu_i[i], mode="same"))
         
-        v_i[i+1] = v_i[i] + DT * (-v_i[i] + ei[i] - ii[i])
-        
-        rho_e[i], rho_i[i] = ephapticCoupling(v_e[i], v_i[i])
-        
-    return rho_e, rho_i, v_e, v_i
+        nu_e[i+1] = sigmoid(v_e[i+1])
+        nu_i[i+1] = sigmoid(v_i[i+1])
+
+    _, ax = plt.subplots(1, 2)
+    for j in range(0, 200, 50):
+        ax[0].plot(X_RANGE, v_e[j], label="v_e " + str(j))
+        ax[0].plot(X_RANGE, v_i[j], label="v_i " + str(j))
+
+        ax[1].plot(X_RANGE, nu_e[j], label="nu_e " + str(j))
+
+    ax[0].legend()
+    ax[1].set_ylim([-0.2, 1.2])
+    ax[1].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+    return v_e, v_i
     
