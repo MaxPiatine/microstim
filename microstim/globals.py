@@ -11,6 +11,7 @@ THRESHOLD = 20 #mV
 
 i_RANGE = np.arange(0, N) #steps
 X_RANGE = np.arange(0, 1000)
+x_linspace = np.linspace(0, 1, N + 2)[1:-1]  # Exclude exact 0 and 1
 
 T = N * DT
 intensity = 500 #microA
