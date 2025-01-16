@@ -28,18 +28,19 @@ sigma = {
     } #microns
 
 weights = {
-        "e->e": 200,
-        "i->e": 150,
-        "e->i": 100,
-        "i->i": 150,
+        "ee": 150,
+        "ie": 200,
+        "ei": 150,
+        "ii": 100,
     }
 
 start_boost = {
     "exc": 1,
-    "inh": 1,
+    "inh": 0.5,
 }
 
+# exc gamma can be between 10**10 and 10**11 without it being unreasonable potential
 gamma = {
-    "exc": 10**10,
-    "inh": 10,
+    "exc": 3*10**9,
+    "inh": 1,
 }
