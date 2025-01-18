@@ -11,7 +11,6 @@ THRESHOLD = 20 #mV
 
 i_RANGE = np.arange(0, N) #steps
 X_RANGE = np.arange(0, 1000)
-x_linspace = np.linspace(0, 1, N + 2)[1:-1]  # Exclude exact 0 and 1
 
 T = N * DT
 intensity = 500 #microA
@@ -22,16 +21,16 @@ T_RANGE = np.arange(0, T, T/N)
 P = 1
 
 sigma = {
-        "ee": 120,
-        "ie": 120,
-        "ei": 120,
-        "ii": 120,
-    } #microns
+        "ee": 127, #microns
+        "ie": 96.6,
+        "ei": 99.84,
+        "ii": 126.77,
+    } 
 
 weights = {
-        "ee": 150,
-        "ie": 200,
-        "ei": 150,
+        "ee": 200000,
+        "ie": 100000,
+        "ei": 70000,
         "ii": 100,
     }
 
@@ -40,8 +39,7 @@ start_boost = {
     "inh": 0.5,
 }
 
-# exc gamma can be between 10**10 and 10**11 without it being unreasonable potential
 gamma = {
-    "exc": 3*10**9,
+    "exc": 10**5,
     "inh": 1,
 }

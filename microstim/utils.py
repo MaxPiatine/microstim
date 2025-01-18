@@ -1,7 +1,8 @@
 import numpy as np
 from scipy.special import erf
 from math import sqrt
-from microstim.globals import THRESHOLD, X_RANGE
+from microstim.globals import THRESHOLD, X_RANGE, N
+
 
 def ephapticCoupling(ve, vi):
     e_thresh, i_thresh = [], []
@@ -17,17 +18,11 @@ def ephapticCoupling(ve, vi):
 Rate functions
 """
 def normal(sigma):
-    return np.exp(-(X_RANGE)**2/(2 * sigma**2)) / (2 * np.pi * sigma**2)
+    x_linspace = np.linspace(-4*sigma, 4*sigma, N)
+    return np.exp(-(x_linspace)**2/(2 * sigma**2)) / (2 * np.pi * sigma**2)
     
 def sigmoid(v):
     return 1 / (1 + np.exp(-(THRESHOLD - v)))
 
 def rect(v):
     return np.where(v >= THRESHOLD, 1, 0)
-
-
-"""
-convoluted functions
-"""
-def KernelConvolution(rho, weight, sigma):
-    return weight * ( erf( (X_RANGE + rho) / (sqrt(2) * sigma) ) - erf( (X_RANGE - rho) / (sqrt(2) * sigma) ) ) * 0.5
