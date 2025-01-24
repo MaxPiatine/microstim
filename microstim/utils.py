@@ -17,9 +17,8 @@ def ephapticCoupling(ve, vi):
 """
 Rate functions
 """
-def normal(sigma):
-    x_linspace = np.linspace(-4*sigma, 4*sigma, N)
-    return np.exp(-(x_linspace)**2/(2 * sigma**2)) / (2 * np.pi * sigma**2)
+def normal(x, sigma):
+    return np.exp(-(x)**2/(2 * sigma**2)) / np.sqrt(2 * np.pi * sigma**2)
     
 def sigmoid(v):
     return 1 / (1 + np.exp(-(THRESHOLD - v)))

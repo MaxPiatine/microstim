@@ -10,7 +10,7 @@ DT = 0.01
 THRESHOLD = 20 #mV
 
 i_RANGE = np.arange(0, N) #steps
-X_RANGE = np.arange(0, 1000)
+X_RANGE = np.arange(0, 1000, 1000/N)
 
 T = N * DT
 intensity = 500 #microA
@@ -18,7 +18,7 @@ intensity = 500 #microA
 T_RANGE = np.arange(0, T, T/N)
 
 # Power Law
-P = 1
+P = 2
 
 sigma = {
         "ee": 127, #microns
@@ -28,10 +28,10 @@ sigma = {
     } 
 
 weights = {
-        "ee": 200000,
-        "ie": 100000,
-        "ei": 70000,
-        "ii": 100,
+        "ee": 400,
+        "ie": 300,
+        "ei": 400,
+        "ii": 200,
     }
 
 start_boost = {
@@ -40,6 +40,6 @@ start_boost = {
 }
 
 gamma = {
-    "exc": 10**5,
-    "inh": 1,
+    "exc": 800,
+    "inh": 100,
 }

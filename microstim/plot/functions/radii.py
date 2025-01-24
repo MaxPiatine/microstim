@@ -1,39 +1,39 @@
 import matplotlib.pylab as plt
+import seaborn as sns
 import numpy as np
 
-from microstim.globals import T_RANGE, intensity, sigma, weights, start_boost, gamma
-from microstim.main import activationModel
+from microstim.globals import T_RANGE, intensity, sigma, weights, sigma
+from microstim.main import model
+from microstim.utils import rect, sigmoid
 
-# no amp
-no_rho_e, _, _, _ = activationModel(intensity, weights, sigma, gamma, start_boost)
+_, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, is_depolarized=False)
+print("done")
+# weights = {
+#         "ee": 150,
+#         "ie": 150,
+#         "ei": 150,
+#         "ii": 150,
+#     }
+# _, _, no_amp, _, _, _ = model(intensity, weights, sigma, rect, is_depolarized=False)
 
-# amp
-weights = {
-        "e->e": 150,
-        "i->e": 100,
-        "e->i": 200,
-        "i->i": 150,
-    }
+# Set the Seaborn theme and palette
+sns.set_theme(style="ticks")
+palette = sns.color_palette("rocket_r", n_colors=3)  # Reverse 'rocket' palette
 
-start_boost = {
-    "exc": 1,
-    "inh": 0.5,
-}
+# Plot the data with Seaborn colors
+ax = plt.subplot(111) 
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
 
-gamma = {
-    "exc": 10**5,
-    "inh": 10**2,
-}
+# plt.plot(T_RANGE, no_amp, color=palette[0], label="No Amp")
+plt.plot(T_RANGE, rho_e, color=palette[1], label=r"$\rho_e$")
+plt.plot(T_RANGE, rho_i, color=palette[2], label=r"$\rho_i$")
 
-rho_e, rho_i, _, _ = activationModel(intensity, weights, sigma, gamma, start_boost)
+# Add labels, limits, and legend
 
-plt.plot(T_RANGE, no_rho_e, color="k")
-plt.plot(T_RANGE, rho_e, color="tab:green")
-plt.plot(T_RANGE, rho_i, color="tab:red")
+plt.xlabel("Normalized Time")
 plt.xlim([0,5])
-plt.xlabel("normalized time")
-plt.ylabel(r"radius [$\mu$m]")
-
-plt.tight_layout()
-plt.savefig("microstim/plot/figures/vectorize/AMradii.svg", format="svg", bbox_inches="tight")
+plt.ylabel(r"Radius [$\mu$m]")
+plt.legend(loc="best")
+# plt.savefig("microstim/plot/figures/vectorize/AMradii.svg", format="svg", bbox_inches="tight")
 plt.show()

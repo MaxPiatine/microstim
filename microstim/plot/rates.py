@@ -3,5 +3,7 @@ from microstim.main import model
 from microstim.utils import rect, normal, sigmoid
 
 
-model(intensity, weights, sigma, rect, is_depolarized=False)
+v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, is_depolarized=True)
+
+
 

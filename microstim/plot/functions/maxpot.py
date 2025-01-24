@@ -1,38 +1,37 @@
 import matplotlib.pylab as plt
+import seaborn as sns
 import numpy as np
 
-from microstim.globals import X_RANGE, intensity, sigma, weights, start_boost, gamma
-from microstim.main import activationModel
+from microstim.globals import X_RANGE, intensity, sigma, weights, start_boost, gamma, T_RANGE
+from microstim.main import model
+from microstim.utils import rect, sigmoid
 
-# no amp
-_, _, no_v_e, _ = activationModel(intensity, weights, sigma, gamma, start_boost)
+v_e, v_i, _, _, _, _ = model(intensity, weights, sigma, rect, is_depolarized=False)
 
-# amp
 weights = {
-        "e->e": 150,
-        "i->e": 100,
-        "e->i": 200,
-        "i->i": 150,
+        "ee": 150,
+        "ie": 150,
+        "ei": 150,
+        "ii": 150,
     }
+no_amp, _, _, _, _, _ = model(intensity, weights, sigma, rect, is_depolarized=False)
 
-start_boost = {
-    "exc": 1,
-    "inh": 0.5,
-}
+# Set the Seaborn theme and palette
+sns.set_theme(style="ticks")
+palette = sns.color_palette("rocket_r", n_colors=3)  # Reverse 'rocket' palette
 
-gamma = {
-    "exc": 10**5,
-    "inh": 10**2,
-}
+# Plot the data with Seaborn colors
+ax = plt.subplot(111) 
+ax.spines['top'].set_visible(False)
+ax.hlines(20, 0 ,1000)
+ax.spines['right'].set_visible(False)
 
-_, _, v_e, v_i = activationModel(intensity, weights, sigma, gamma, start_boost)
+# Use the Seaborn palette colors
+plt.plot(X_RANGE, np.max(v_e, axis=1), color="black", label="max over time")
+plt.plot(X_RANGE, v_e[:][100], color=palette[1], label="amp v_e @ 100")
 
-plt.plot(X_RANGE, np.clip(no_v_e[:, 100], -20, 20), color="k")
-plt.plot(X_RANGE, np.clip(v_e[:, 100], -20, 20), color="tab:green")
-plt.plot(X_RANGE, np.clip(v_i[:, 100], -20, 20), color="tab:red")
-plt.xlabel(r"distance [$\mu$m]")
-plt.ylabel("max. pot. [mV]")
-
-plt.tight_layout()
-plt.savefig("microstim/plot/figures/vectorize/AMmaxpot.svg", format="svg", bbox_inches="tight")
+# Add labels, limits, and legend
+plt.xlabel("distance")
+plt.ylabel("mV")
+plt.legend(loc="best")
 plt.show()
