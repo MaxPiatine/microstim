@@ -1,10 +1,13 @@
+import gc
 import numpy as np
 from scipy.special import erf
 from math import sqrt
 from microstim.globals import THRESHOLD, X_RANGE, N
 
+import matplotlib.pylab as plt
 
-def ephapticCoupling(ve, vi):
+
+def maxRadius(ve, vi):
     e_thresh, i_thresh = [], []
     for distance, e_pot, i_pot in zip(X_RANGE, ve, vi):
         if e_pot > THRESHOLD:
@@ -25,3 +28,28 @@ def sigmoid(v):
 
 def rect(v):
     return np.where(v >= THRESHOLD, 1, 0)
+
+
+def plot_tn(responses, n):
+    f = plt.figure()
+    ax = plt.subplot(111)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.set_ylim(0, 150)
+
+    plt.title("time step "+str(n))
+    plt.xlabel("Distance (μm)")
+    plt.ylabel("Relative Voltage mV")
+
+    plt.plot(X_RANGE, responses)
+
+    f.tight_layout()
+    
+    #for no ephaptic
+    save_name = "./microstim/plot/results/"+str(n)+"connectivity.png"
+    
+    plt.savefig(save_name, transparent=True)
+    
+    #close known Matplotlib memory leak
+    plt.close()
+    gc.collect()
