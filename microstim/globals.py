@@ -1,11 +1,11 @@
 import numpy as np
 
-N = 1000
+N = 100000
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
 BETA = 1
-DT = 0.01
+DT = 1
 
 THRESHOLD = 20 #mV
 
@@ -40,6 +40,6 @@ start_boost = {
 }
 
 gamma = {
-    "exc": 800,
-    "inh": 100,
+    "exc": 100,
+    "inh": 50,
 }
