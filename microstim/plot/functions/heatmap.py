@@ -2,28 +2,28 @@ import os
 import matplotlib.pylab as plt
 import numpy as np
 
-from microstim.main import activationModel
-from microstim.globals import weights, sigma, intensity, start_boost, gamma
+from microstim.main import model
+from microstim.globals import weights, sigma, intensity, gamma
+from microstim.utils import rect
 
 # heatmap
-Wei_RANGE = np.arange(0, 500, 1)
-gamma_RANGE = np.arange(0, 500, 1)
-heatmap = np.zeros((len(Wei_RANGE), len(gamma_RANGE)))
+gamma_RANGE = np.arange(0, 200, 10)
+heatmap = np.zeros((len(gamma_RANGE), len(gamma_RANGE)))
 
-for x, W_ei in enumerate(Wei_RANGE):
-    weights["e->i"] = W_ei
-    print(x)
-    for y, exc_gamma in enumerate(gamma_RANGE):
-        gamma["exc"] = exc_gamma
-        rho_e, rho_i, v_e, v_i = activationModel(intensity, weights, sigma, gamma, start_boost)
-        heatmap[x][y] += max(rho_i)
+for x, g_i in enumerate(gamma_RANGE):
+    gamma["inh"] = g_i
+    for y, g_e in enumerate(gamma_RANGE):
+        gamma["exc"] = g_e
+        print(gamma)
+        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, gamma, is_depolarized=False)
+        heatmap[x][y] += max(rho_e)
 
 
 plt.imshow(heatmap, origin="lower", cmap='plasma', interpolation="nearest", aspect="auto")
 plt.colorbar()
 
-plt.xlabel("ephaptic inh.")
-plt.ylabel("exc. to inh. weight")
+plt.xlabel("gamma exc")
+plt.ylabel("gamma inh")
 
 
 os.system('say "your program has finished"')

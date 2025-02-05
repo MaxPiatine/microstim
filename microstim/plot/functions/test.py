@@ -2,7 +2,7 @@ import matplotlib.pylab as plt
 import matplotlib.animation as animation
 import numpy as np
 
-from microstim.globals import T_RANGE, X_RANGE, intensity, sigma, weights, sigma, N
+from microstim.globals import T_RANGE, X_RANGE, intensity, sigma, weights, sigma, gamma
 from microstim.main import model
 from microstim.utils import rect, sigmoid
 
@@ -11,7 +11,7 @@ import glob
 import os
 
 # Call your model function to ensure other computations complete if necessary
-v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, is_depolarized=False)
+v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, gamma, is_depolarized=False)
 
 # Get all image files sorted by modification time
 files = sorted(glob.glob("./microstim/plot/results/*.png"), key=os.path.getmtime)
@@ -38,5 +38,5 @@ animated = animation.FuncAnimation(
 )
 
 # Save the animation as a GIF
-animated.save("./microstim/plot/animations/Animated.gif", writer="pillow", fps=30)
+animated.save("./microstim/plot/animations/Vi_e180_i1.gif", writer="pillow", fps=30)
 plt.show()

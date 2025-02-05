@@ -1,8 +1,6 @@
 import gc
 import numpy as np
-from scipy.special import erf
-from math import sqrt
-from microstim.globals import THRESHOLD, X_RANGE, N
+from microstim.globals import THRESHOLD, X_RANGE
 
 import matplotlib.pylab as plt
 
@@ -35,7 +33,7 @@ def plot_tn(responses, n):
     ax = plt.subplot(111)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    ax.set_ylim(0, 150)
+    ax.set_ylim(-50, 150)
 
     plt.title("time step "+str(n))
     plt.xlabel("Distance (μm)")
