@@ -1,6 +1,6 @@
 import numpy as np
 
-N = 9000
+N = 1500
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
@@ -11,7 +11,7 @@ TAU = 10 #ms
 THRESHOLD = 20 #mV
 
 i_RANGE = np.arange(0, N) #steps
-X_RANGE = np.arange(0, 3000, 3000/N)
+X_RANGE = np.arange(0, 3000, 0.1)
 
 T = N * DT
 intensity = 500 #microA
@@ -30,9 +30,9 @@ sigma = {
 
 weights = {
         "ee": 400,
-        "ie": 200,
-        "ei": 100,
-        "ii": 200,
+        "ie": 300,
+        "ei": 400,
+        "ii": 25,
     }
 
 # depolarize true???
@@ -56,6 +56,6 @@ start_boost = {
 }
 
 gamma = {
-    "exc": 180,
-    "inh": 1,
+    "exc": 150,
+    "inh": 20,
 }
