@@ -38,5 +38,6 @@ animated = animation.FuncAnimation(
 )
 
 # Save the animation as a GIF
-animated.save("./microstim/plot/animations/Vi_e180_i1.gif", writer="pillow", fps=30)
+animated.save("./microstim/plot/animations/amp_ve_am.gif", writer="pillow", fps=30)
+os.system('say "Potential GIF finished"')
 plt.show()

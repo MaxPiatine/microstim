@@ -7,7 +7,7 @@ from microstim.globals import T_RANGE, intensity, sigma, weights, sigma, gamma
 from microstim.main import model
 from microstim.utils import rect, sigmoid
 
-_, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, gamma, is_depolarized=False)
+_, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, gamma, is_depolarized=True)
 print("done")
 # weights = {
 #         "ee": 150,
