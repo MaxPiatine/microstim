@@ -1,3 +1,7 @@
-![alt text](../assets/graphs.png)
-
-![alt text](../assets/desc.png)
+### Parameters 
+```math
+\sigma \text{ width } \\
+\beta \text{ start boost }\\
+W \text{ weight }\\
+\Theta \text{ rate }
+```
