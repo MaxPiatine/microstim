@@ -1,11 +1,13 @@
 import numpy as np
-import matplotlib.pylab as plt
-from scipy.integrate import quad
+import time
+# import matplotlib.pylab as plt
 
-from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, DT, R, P, start_boost, T_RANGE, TAU
+from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, DT, R, P, TAU
 from microstim.utils import maxRadius, normal, plot_tn
 
-def model(intensity, weights, sigma, rate, gamma, is_depolarized=True):
+def model(intensity, weights, sigma, rate, gamma, start_boost, is_depolarized=True):
+    start_time = time.time()
+
     rho_e, rho_i = np.zeros(N), np.zeros(N)
     nu_e, nu_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
     v_e, v_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
@@ -41,7 +43,7 @@ def model(intensity, weights, sigma, rate, gamma, is_depolarized=True):
     wii = weights["ii"] * normal(ii_linspace, sigma["ii"])            
 
     # ignore
-    plot_tn(v_e[0], 0)
+    # plot_tn(v_e[0], 0)
             
     for i in range(0, len(i_RANGE)-1):
 
@@ -69,8 +71,9 @@ def model(intensity, weights, sigma, rate, gamma, is_depolarized=True):
 
 
         # ignore: animation plot
-        plot_tn(v_e[i+1], i+1)
-        print("time step: ", i+1)
+        # plot_tn(v_e[i+1], i+1)
+        print("time step: ", i)
 
+    print("%s seconds " % (time.time() - start_time))
     return v_e, v_i, rho_e, rho_i, nu_e, nu_i
 

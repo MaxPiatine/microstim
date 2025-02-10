@@ -1,6 +1,6 @@
 import numpy as np
 
-N = 1500
+N = 3000
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
