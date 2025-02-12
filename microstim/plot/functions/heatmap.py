@@ -1,13 +1,14 @@
 import os
 import matplotlib.pylab as plt
 import numpy as np
+import seaborn as sns
 
 from microstim.main import model
 from microstim.globals import weights, sigma, intensity, gamma, start_boost
 from microstim.utils import rect
 
-boost = start_boost.copy()
-ranges = np.arange(0, 1, 0.1)
+boost = gamma.copy()
+ranges = np.arange(0, 500, 50)
 
 
 heatmap = np.zeros((len(ranges), len(ranges)))
@@ -17,19 +18,25 @@ for x, inh_boost in enumerate(ranges):
     for y, exc_boost in enumerate(ranges):
         boost["exc"] = exc_boost
         
-        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, gamma, boost, is_depolarized=True)
+        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=False)
         heatmap[x][y] += max(rho_e)
 
         print(boost)
 
+# Create the heatmap using seaborn
+plt.figure(figsize=(8, 6))
+ax = sns.heatmap(
+    heatmap,
+    xticklabels=np.round(ranges, 2),  
+    yticklabels=np.round(ranges, 2),  
+    linewidths=0.5, 
+)
 
-plt.imshow(heatmap, origin="lower", cmap='plasma', interpolation="nearest", aspect="auto")
-plt.colorbar()
+ax.invert_yaxis()
 
-plt.xlabel(r"$k_I$")
-plt.ylabel(r"$k_E$")
+ax.set_xlabel(r"$\alpha_e$")
+ax.set_ylabel(r"$\alpha_i$")
 
-
-os.system('say "your program has finished"')
+os.system('say "Your program has finished"')
 
 plt.show()

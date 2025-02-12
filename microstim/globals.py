@@ -35,21 +35,6 @@ weights = {
         "ii": 25,
     }
 
-# depolarize true???
-# sigma = {
-#         "ee": 100,
-#         "ie": 100,
-#         "ei": 100,
-#         "ii": 100,
-#     } #microns
-
-# weights = {
-#         "ee": 150,
-#         "ie": 150,
-#         "ei": 150,
-#         "ii": 0,
-#     }
-
 start_boost = {
     "exc": 1,
     "inh": 0.5,

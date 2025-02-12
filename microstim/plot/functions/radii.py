@@ -6,7 +6,9 @@ from microstim.globals import T_RANGE, intensity, sigma, weights, sigma, gamma, 
 from microstim.main import model
 from microstim.utils import rect, sigmoid
 
-_, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, gamma, start_boost, is_depolarized=False)
+
+boost = gamma.copy()
+_, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=False)
 
 weights = {
         "ee": 150,
@@ -15,18 +17,16 @@ weights = {
         "ii": 150,
     }
 
-start_boost = {
+no_boost = {
     "exc": 1,
     "inh": 1,
 }
 
-_, _, no_amp, _, _, _ = model(intensity, weights, sigma, rect, gamma, start_boost, is_depolarized=False)
+_, _, no_amp, _, _, _ = model(intensity, weights, sigma, rect, no_boost, is_depolarized=False)
 
-# Set the Seaborn theme and palette
 sns.set_theme(style="ticks")
-palette = sns.color_palette("rocket_r", n_colors=3)  # Reverse 'rocket' palette
+palette = sns.color_palette("rocket_r", n_colors=3) 
 
-# Plot the data with Seaborn colors
 ax = plt.subplot(111) 
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)

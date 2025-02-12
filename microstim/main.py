@@ -1,11 +1,10 @@
 import numpy as np
 import time
-# import matplotlib.pylab as plt
 
 from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, DT, R, P, TAU
 from microstim.utils import maxRadius, normal, plot_tn
 
-def model(intensity, weights, sigma, rate, gamma, start_boost, is_depolarized=True):
+def model(intensity, weights, sigma, rate, boost, is_depolarized=True):
     start_time = time.time()
 
     rho_e, rho_i = np.zeros(N), np.zeros(N)
@@ -21,8 +20,8 @@ def model(intensity, weights, sigma, rate, gamma, start_boost, is_depolarized=Tr
         """
         depolarized model
         """
-        v_e[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["exc"]
-        v_i[0] = R*intensity/(X_RANGE + ALPHA)**P * start_boost["inh"]
+        v_e[0] = R*intensity/(X_RANGE + ALPHA)**P * boost["exc"]
+        v_i[0] = R*intensity/(X_RANGE + ALPHA)**P * boost["inh"]
         
         nu_e[0] = rate(v_e[0])
         nu_i[0] = rate(v_i[0])
@@ -32,8 +31,8 @@ def model(intensity, weights, sigma, rate, gamma, start_boost, is_depolarized=Tr
         """
         activation model
         """
-        nu_e[0] = np.log(intensity) * gamma["exc"] * normal(X_RANGE, sigma["ee"])
-        nu_i[0] = np.log(intensity) * gamma["inh"] * normal(X_RANGE, sigma["ii"])
+        nu_e[0] = np.log(intensity) * boost["exc"] * normal(X_RANGE, sigma["ee"])
+        nu_i[0] = np.log(intensity) * boost["inh"] * normal(X_RANGE, sigma["ii"])
 
 
     # synaptic connectivity
@@ -41,9 +40,6 @@ def model(intensity, weights, sigma, rate, gamma, start_boost, is_depolarized=Tr
     wie = weights["ie"] * normal(ie_linspace, sigma["ie"])
     wei = weights["ei"] * normal(ei_linspace, sigma["ei"])
     wii = weights["ii"] * normal(ii_linspace, sigma["ii"])            
-
-    # ignore
-    # plot_tn(v_e[0], 0)
             
     for i in range(0, len(i_RANGE)-1):
 
@@ -55,23 +51,7 @@ def model(intensity, weights, sigma, rate, gamma, start_boost, is_depolarized=Tr
         
         rho_e[i+1], rho_i[i+1] = maxRadius(v_e[i+1], v_i[i+1])
         
-        # if i % 20 == 0 or i == 1 or i == 2:
-        # _, ax = plt.subplots(3, 1)
-        # ax[0].plot(X_RANGE, v_e[i], label="v_e " + str(i))
-        # ax[0].plot(X_RANGE, nu_e[i], label="nu_e " + str(i))
-        # ax[0].legend()
-
-        # ax[1].plot(X_RANGE, v_i[i], label="v_i " + str(i))
-        # ax[1].plot(X_RANGE, nu_i[i], label="nu_i " + str(i))
-        # ax[1].legend()
-
-        # ax[2].plot(X_RANGE, np.convolve(wee, nu_e[i], mode="same") - np.convolve(wie, nu_i[i], mode="same"), label="K_e - K_i " + str(i))
-        # plt.tight_layout()
-        # plt.show()
-
-
-        # ignore: animation plot
-        # plot_tn(v_e[i+1], i+1)
+        # plot_tn(v_e[i], i) # animations
         print("time step: ", i)
 
     print("%s seconds " % (time.time() - start_time))
