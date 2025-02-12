@@ -10,24 +10,18 @@ from PIL import Image
 import glob
 import os
 
-# Call your model function to ensure other computations complete if necessary
-v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, gamma, is_depolarized=False)
+boost = gamma.copy()
+v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, boost, is_depolarized=False)
 
-# Get all image files sorted by modification time
+
 files = sorted(glob.glob("./microstim/plot/results/*.png"), key=os.path.getmtime)
-
-# Load images as numpy arrays
 images = [np.array(Image.open(file)) for file in files]
-
-# Ensure results directory exists
 os.makedirs("results", exist_ok=True)
 
-# Set up the figure and axis
 fig, ax = plt.subplots()
 im = ax.imshow(images[0], animated=True)
-plt.axis("off")  # Turn off the axis for clean visuals
+plt.axis("off") 
 
-# Define the update function for animation
 def update(i):
     im.set_array(images[i])
     return [im]

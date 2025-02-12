@@ -27,7 +27,9 @@ def sigmoid(v):
 def rect(v):
     return np.where(v >= THRESHOLD, 1, 0)
 
-
+"""
+animation plot
+"""
 def plot_tn(responses, n):
     f = plt.figure()
     ax = plt.subplot(111)

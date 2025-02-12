@@ -1,6 +1,6 @@
 import numpy as np
 
-N = 1500
+N = 3000
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
@@ -34,21 +34,6 @@ weights = {
         "ei": 400,
         "ii": 25,
     }
-
-# depolarize true???
-# sigma = {
-#         "ee": 100,
-#         "ie": 100,
-#         "ei": 100,
-#         "ii": 100,
-#     } #microns
-
-# weights = {
-#         "ee": 150,
-#         "ie": 150,
-#         "ei": 150,
-#         "ii": 0,
-#     }
 
 start_boost = {
     "exc": 1,
