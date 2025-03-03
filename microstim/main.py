@@ -1,7 +1,7 @@
 import numpy as np
 import time
 
-from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, DT, R, P, TAU
+from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, DT, R, P, TAU, THRESHOLD, D, ee_linspace, ei_linspace, ii_linspace, ie_linspace
 from microstim.utils import maxRadius, normal, plot_tn
 
 def model(intensity, weights, sigma, rate, boost, is_depolarized=True):
@@ -10,11 +10,6 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True):
     rho_e, rho_i = np.zeros(N), np.zeros(N)
     nu_e, nu_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
     v_e, v_i = np.zeros((len(i_RANGE), len(X_RANGE))), np.zeros((len(i_RANGE), len(X_RANGE)))
-    
-    ee_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], len(X_RANGE)) 
-    ie_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], len(X_RANGE)) 
-    ei_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], len(X_RANGE)) 
-    ii_linspace = np.linspace(-4*sigma["ii"], 4*sigma["ii"], len(X_RANGE))
 
     if is_depolarized:
         """
@@ -51,7 +46,7 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True):
         
         rho_e[i+1], rho_i[i+1] = maxRadius(v_e[i+1], v_i[i+1])
         
-        # plot_tn(v_e[i], i) # animations
+        # plot_tn([v_e[i], v_i[i]], i) # animations
         print("time step: ", i)
 
     print("%s seconds " % (time.time() - start_time))

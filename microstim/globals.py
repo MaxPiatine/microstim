@@ -1,17 +1,18 @@
 import numpy as np
 
-N = 3000
+N = 1000
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
 BETA = 1
 DT = 0.01
 TAU = 10 #ms
+D = 0.3 #nanometer
 
 THRESHOLD = 20 #mV
 
 i_RANGE = np.arange(0, N) #steps
-X_RANGE = np.arange(0, 3000, 0.1)
+X_RANGE = np.arange(0, 2000, 0.1)
 
 T = N * DT
 intensity = 500 #microA
@@ -44,3 +45,9 @@ gamma = {
     "exc": 150,
     "inh": 20,
 }
+
+# linspaces
+ee_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], len(X_RANGE)) 
+ie_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], len(X_RANGE)) 
+ei_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], len(X_RANGE)) 
+ii_linspace = np.linspace(-4*sigma["ii"], 4*sigma["ii"], len(X_RANGE))

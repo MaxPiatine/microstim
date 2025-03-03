@@ -2,7 +2,7 @@ import matplotlib.pylab as plt
 import matplotlib.animation as animation
 import numpy as np
 
-from microstim.globals import T_RANGE, X_RANGE, intensity, sigma, weights, sigma, gamma
+from microstim.globals import T_RANGE, X_RANGE, intensity, sigma, weights, sigma, gamma, start_boost
 from microstim.main import model
 from microstim.utils import rect, sigmoid
 
@@ -11,10 +11,10 @@ import glob
 import os
 
 boost = gamma.copy()
-v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, boost, is_depolarized=False)
+v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, boost, is_depolarized=True)
 
 
-files = sorted(glob.glob("./microstim/plot/results/*.png"), key=os.path.getmtime)
+files = sorted(glob.glob("./microstim/plot/results2/*.png"), key=os.path.getmtime)
 images = [np.array(Image.open(file)) for file in files]
 os.makedirs("results", exist_ok=True)
 
@@ -32,6 +32,6 @@ animated = animation.FuncAnimation(
 )
 
 # Save the animation as a GIF
-animated.save("./microstim/plot/animations/amp_ve_am.gif", writer="pillow", fps=30)
+animated.save("./microstim/plot/animations/NOAMPDM.gif", writer="pillow", fps=30)
 os.system('say "Potential GIF finished"')
 plt.show()

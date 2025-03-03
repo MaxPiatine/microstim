@@ -1,8 +1,9 @@
 import gc
 import numpy as np
-from microstim.globals import THRESHOLD, X_RANGE
-
+import seaborn as sns
 import matplotlib.pylab as plt
+
+from microstim.globals import THRESHOLD, X_RANGE, R
 
 
 def maxRadius(ve, vi):
@@ -13,7 +14,6 @@ def maxRadius(ve, vi):
         if i_pot > THRESHOLD:
             i_thresh.append(distance)
     return max(e_thresh, default=0), max(i_thresh, default=0)
-
 
 """
 Rate functions
@@ -31,22 +31,25 @@ def rect(v):
 animation plot
 """
 def plot_tn(responses, n):
+    sns.set_theme(style="ticks")
+    palette = sns.color_palette("rocket_r", n_colors=3) 
+
     f = plt.figure()
     ax = plt.subplot(111)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-    ax.set_ylim(-50, 150)
 
     plt.title("time step "+str(n))
     plt.xlabel("Distance (μm)")
     plt.ylabel("Relative Voltage mV")
 
-    plt.plot(X_RANGE, responses)
+    ax.hlines(20, 0 , max(X_RANGE), color="k", linestyles='-.')
+    plt.plot(X_RANGE, responses[0], color=palette[1], label=r"$V_e$")
+    plt.plot(X_RANGE, responses[1], color=palette[2], label=r"$V_i$")
 
     f.tight_layout()
     
-    #for no ephaptic
-    save_name = "./microstim/plot/results/"+str(n)+"connectivity.png"
+    save_name = "./microstim/plot/results2/"+str(n)+"plot.png"
     
     plt.savefig(save_name, transparent=True)
     
