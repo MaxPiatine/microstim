@@ -52,6 +52,9 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True):
         rho_e[i+1], rho_i[i+1] = maxRadius(v_e[i+1], v_i[i+1])
         
         # plot_tn(v_e[i], i) # animations
+        # plt.plot(X_RANGE, v_e[i])
+        # plt.plot(X_RANGE, nu_e[i])
+        # plt.show()
         print("time step: ", i)
 
     print("%s seconds " % (time.time() - start_time))
