@@ -27,6 +27,21 @@ def sigmoid(v):
 def rect(v):
     return np.where(v >= THRESHOLD, 1, 0)
 
+def sigmoidalRect(v):
+    x = rect(v)
+    f = 1
+    for index, step in enumerate(x):
+        try:
+            if x[index] == 1 and x[index+1] == 0:
+                f *= 1 / (1 + np.exp(-x + index/len(x)))
+            elif x[index] == 0 and x[index+1] == 1:
+                f *= 1 / (1 + np.exp(x - index/len(x)))
+            else:
+                continue
+        except IndexError:
+            continue
+    return f
+
 """
 animation plot
 """
