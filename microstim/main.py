@@ -4,6 +4,9 @@ import time
 from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, DT, R, P, TAU, THRESHOLD, D, ee_linspace, ei_linspace, ii_linspace, ie_linspace
 from microstim.utils import maxRadius, normal, plot_tn
 
+import matplotlib.pylab as plt
+import seaborn as sns
+
 def model(intensity, weights, sigma, rate, boost, is_depolarized=True):
     start_time = time.time()
 
@@ -34,8 +37,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True):
     wee = weights["ee"] * normal(ee_linspace, sigma["ee"])
     wie = weights["ie"] * normal(ie_linspace, sigma["ie"])
     wei = weights["ei"] * normal(ei_linspace, sigma["ei"])
-    wii = weights["ii"] * normal(ii_linspace, sigma["ii"])            
-            
+    wii = weights["ii"] * normal(ii_linspace, sigma["ii"])   
+
     for i in range(0, len(i_RANGE)-1):
 
         v_e[i+1] = v_e[i] + DT * (-1/TAU * v_e[i] + np.convolve(wee, nu_e[i], mode="same") - np.convolve(wie, nu_i[i], mode="same"))

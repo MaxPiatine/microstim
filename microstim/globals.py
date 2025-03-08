@@ -22,19 +22,34 @@ T_RANGE = np.arange(0, T, T/N)
 # Power Law
 P = 2
 
+# sigma = {
+#         "ee": 127, #microns
+#         "ie": 96.6,
+#         "ei": 99.84,
+#         "ii": 126.77,
+#     } 
+
 sigma = {
-        "ee": 127, #microns
-        "ie": 96.6,
-        "ei": 99.84,
-        "ii": 126.77,
+        "ee": 150, #microns
+        "ie": 150,
+        "ei": 150,
+        "ii": 150,
     } 
 
+
 weights = {
-        "ee": 400,
-        "ie": 300,
-        "ei": 400,
+        "ee": 230,
+        "ie": 150,
+        "ei": 150,
         "ii": 25,
-    }
+    } # depol model
+
+# weights = {
+#         "ee": 400,
+#         "ie": 300,
+#         "ei": 400,
+#         "ii": 25,
+#     } #activation model
 
 start_boost = {
     "exc": 1,
