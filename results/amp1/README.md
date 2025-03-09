@@ -29,3 +29,5 @@ k = \begin{cases}
 
 ![](depolarizationAnimation.gif)
 ![](activationAnimation.gif)
+![alt text](dmKHeatmap.png)
+![alt text](amAlphaHeatmap.png)
