@@ -15,7 +15,7 @@ print(files_path)
 list(map(os.remove, glob.glob(os.path.join(files_path, "*.png"))))
 
 boost = start_boost.copy()
-v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, boost, is_depolarized=True)
+v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, boost, is_depolarized=True, gif=True)
 
 
 files = sorted(glob.glob("./microstim/plot/results/*.png"), key=os.path.getmtime)

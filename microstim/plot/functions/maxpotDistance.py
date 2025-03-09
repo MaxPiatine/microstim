@@ -3,26 +3,13 @@ import matplotlib.pylab as plt
 import seaborn as sns
 import numpy as np
 
-from microstim.globals import X_RANGE, intensity, sigma, weights, start_boost, gamma
+from microstim.globals import X_RANGE, intensity, sigma, weights, start_boost, gamma, no_boost, no_boost_weights
 from microstim.main import model
 from microstim.utils import rect, sigmoid
 
 boost = start_boost.copy()
 v_e, v_i, _, _, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=True)
-
-weights = {
-        "ee": 150,
-        "ie": 150,
-        "ei": 150,
-        "ii": 150,
-    }
-
-no_boost = {
-    "exc": 1,
-    "inh": 1,
-}
-
-no_amp, _, _, _, _, _ = model(intensity, weights, sigma, rect, no_boost, is_depolarized=True)
+no_amp, _, _, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=True)
 
 sns.set_theme(style="ticks")
 palette = sns.color_palette("rocket_r", n_colors=3)  # Reverse 'rocket' palette

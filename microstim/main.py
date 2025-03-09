@@ -7,7 +7,7 @@ from microstim.utils import maxRadius, normal, plot_tn
 import matplotlib.pylab as plt
 import seaborn as sns
 
-def model(intensity, weights, sigma, rate, boost, is_depolarized=True):
+def model(intensity, weights, sigma, rate, boost, is_depolarized=True, gif=False):
     start_time = time.time()
 
     rho_e, rho_i = np.zeros(N), np.zeros(N)
@@ -49,8 +49,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True):
         
         rho_e[i+1], rho_i[i+1] = maxRadius(v_e[i+1], v_i[i+1])
         
-        # plot_tn([v_e[i], v_i[i]], i) # animations
-        # print("time step: ", i)
+        if gif:
+            plot_tn([v_e[i], v_i[i]], i) # animations
 
     print("%s seconds " % (time.time() - start_time))
     return v_e, v_i, rho_e, rho_i, nu_e, nu_i
