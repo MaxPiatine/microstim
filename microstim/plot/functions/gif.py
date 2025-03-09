@@ -11,8 +11,6 @@ import glob
 import os
 
 files_path = current_dir + "/plot/results/"
-print(files_path)
-list(map(os.remove, glob.glob(os.path.join(files_path, "*.png"))))
 
 boost = start_boost.copy()
 v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, boost, is_depolarized=True, gif=True)
@@ -37,5 +35,6 @@ animated = animation.FuncAnimation(
 
 # Save the animation as a GIF
 animated.save("./microstim/plot/animations/sigmoid.gif", writer="pillow", fps=30)
+list(map(os.remove, glob.glob(os.path.join(files_path, "*.png"))))
 os.system('say "Potential GIF finished"')
 plt.show()
