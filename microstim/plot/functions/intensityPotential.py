@@ -9,16 +9,16 @@ from microstim.utils import rect, sigmoid, sigmoidalRect
 
 
 
-boost = start_boost.copy()
+boost = gamma.copy()
 max_pot = []
 no_pot = []
-intensity = np.arange(0, 300, 25)
+intensity = np.arange(0.25, 300, 25)
 for i in intensity:
-    print("intensity %i" % i)
-    v_e, _, _, _, _, _ = model(i, weights, sigma, rect, boost, is_depolarized=True)
-    no_amp, _, _, _, _, _ = model(i, no_boost_weights, sigma, rect, no_boost, is_depolarized=True)
-    max_pot.append(max(np.clip(v_e[:, 250], -100, 20)))
-    no_pot.append(max(np.clip(no_amp[:,250], -100, 20)))
+    print("intensity %f" % i)
+    v_e, _, _, _, _, _ = model(i, weights, sigma, rect, boost, is_depolarized=False)
+    no_amp, _, _, _, _, _ = model(i, no_boost_weights, sigma, rect, no_boost, is_depolarized=False)
+    max_pot.append(max(np.clip(v_e[:, 100], -100, 20)))
+    no_pot.append(max(np.clip(no_amp[:,100], -100, 20)))
 
 
 sns.set_theme(style="ticks")
@@ -31,8 +31,8 @@ plt.ylabel("mV")
 plt.plot(intensity, no_pot, color=palette[0], label="no amp")
 plt.plot(intensity, max_pot, color=palette[1], label="exc amp")
 plt.legend(loc="best")  
-plt.savefig("results/amp2/svg/intensityPotential.svg", format="svg", bbox_inches="tight")
-plt.savefig("results/amp2/intensityPotential.png", format="png", bbox_inches="tight")
+plt.savefig("results/amp1/svg/intensityPotentialX=250microns.svg", format="svg", bbox_inches="tight")
+plt.savefig("results/amp1/intensityPotentialX=250microns.png", format="png", bbox_inches="tight")
 os.system('say "Intensity plot finished"')
 
 plt.show()

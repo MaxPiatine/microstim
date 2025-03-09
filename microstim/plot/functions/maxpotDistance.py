@@ -7,9 +7,9 @@ from microstim.globals import X_RANGE, intensity, sigma, weights, start_boost, g
 from microstim.main import model
 from microstim.utils import rect, sigmoid
 
-boost = start_boost.copy()
-v_e, v_i, _, _, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=True)
-no_amp, _, _, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=True)
+boost = gamma.copy()
+v_e, v_i, _, _, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=False)
+no_amp, _, _, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=False)
 
 sns.set_theme(style="ticks")
 palette = sns.color_palette("rocket_r", n_colors=3)  # Reverse 'rocket' palette
@@ -27,8 +27,8 @@ plt.plot(X_RANGE, np.clip(np.max(no_amp, axis=0), 0, 20), color=palette[0], labe
 plt.xlabel("distance")
 plt.ylabel("mV")
 plt.legend(loc="best")
-plt.savefig("results/amp2/svg/maxpotDistance.svg", format="svg", bbox_inches="tight")
-plt.savefig("results/amp2/maxpotDistance.png", format="png", bbox_inches="tight")
+plt.savefig("results/amp1/svg/maxpotDistance.svg", format="svg", bbox_inches="tight")
+plt.savefig("results/amp1/maxpotDistance.png", format="png", bbox_inches="tight")
 os.system('say "maximum potential finished"')
 
 plt.show()
