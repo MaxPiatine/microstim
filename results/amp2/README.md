@@ -26,4 +26,6 @@ k = \begin{cases}
 ![alt text](radii.png)
 ![alt text](maxpotDistance.png)
 ![alt text](maxpotX=250microns.png)
+![alt text](intensityRadius.png)
+![alt text](intensityPotentialX=250microns.png)
 ![alt text](EIheatmap.png)

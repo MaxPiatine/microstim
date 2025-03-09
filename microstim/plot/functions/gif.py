@@ -34,7 +34,7 @@ animated = animation.FuncAnimation(
 )
 
 # Save the animation as a GIF
-animated.save("./microstim/plot/animations/sigmoid.gif", writer="pillow", fps=30)
+animated.save("./results/master/newgif.gif", writer="pillow", fps=30)
 list(map(os.remove, glob.glob(os.path.join(files_path, "*.png"))))
 os.system('say "Potential GIF finished"')
 plt.show()
