@@ -64,7 +64,7 @@ def plot_tn(responses, n):
 
     f.tight_layout()
     
-    save_name = "./microstim/plot/results2/"+str(n)+"plot.png"
+    save_name = "./microstim/plot/results/"+str(n)+"plot.png"
     
     plt.savefig(save_name, transparent=True)
     

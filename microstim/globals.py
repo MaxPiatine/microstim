@@ -1,6 +1,9 @@
 import numpy as np
+import os
 
-N = 1000
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+N = 500
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
@@ -50,6 +53,18 @@ weights = {
 #         "ei": 400,
 #         "ii": 25,
 #     } #activation model
+
+no_boost_weights = {
+        "ee": 150,
+        "ie": 150,
+        "ei": 150,
+        "ii": 150,
+    }
+
+no_boost = {
+    "exc": 1,
+    "inh": 1,
+}
 
 start_boost = {
     "exc": 1,
