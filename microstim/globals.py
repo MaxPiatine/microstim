@@ -8,9 +8,9 @@ N = 1000
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
 BETA = 1
-DT = 0.001 #s
-TAU = 1/0.01
-SYN = 1/0.005
+DT = 0.0001 #s
+TAU = 0.01
+SYN = 0.005
 D = 0.3 #nanometer
 
 THRESHOLD = 20 #mV
