@@ -3,13 +3,14 @@ import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-N = 500
+N = 1000
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
 BETA = 1
-DT = 0.01
-TAU = 10 #ms
+DT = 0.001 #s
+TAU = 1/0.01
+SYN = 1/0.005
 D = 0.3 #nanometer
 
 THRESHOLD = 20 #mV
@@ -25,34 +26,34 @@ T_RANGE = np.arange(0, T, T/N)
 # Power Law
 P = 2
 
-sigma = {
-        "ee": 127, #microns
-        "ie": 96.6,
-        "ei": 99.84,
-        "ii": 126.77,
-    } # activation model
-
-weights = {
-        "ee": 400,
-        "ie": 300,
-        "ei": 400,
-        "ii": 25,
-    } # activation model
-
 # sigma = {
-#         "ee": 150, #microns
-#         "ie": 150,
-#         "ei": 150,
-#         "ii": 150,
-#     } #depol model
-
+#         "ee": 127, #microns
+#         "ie": 96.6,
+#         "ei": 99.84,
+#         "ii": 126.77,
+#     } # activation model
 
 # weights = {
-#         "ee": 230,
-#         "ie": 150,
-#         "ei": 150,
+#         "ee": 400,
+#         "ie": 300,
+#         "ei": 400,
 #         "ii": 25,
-#     } # depol model
+#     } # activation model
+
+sigma = {
+        "ee": 300, #microns
+        "ie": 150,
+        "ei": 150,
+        "ii": 100,
+    } #depol model
+
+
+weights = {
+        "ee": 200,
+        "ie": 150,
+        "ei": 200,
+        "ii": 10,
+    } # depol model
 
 no_boost_weights = {
         "ee": 150,

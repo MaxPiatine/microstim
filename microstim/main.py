@@ -1,11 +1,9 @@
 import numpy as np
 import time
-
-from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, DT, R, P, TAU, THRESHOLD, D, ee_linspace, ei_linspace, ii_linspace, ie_linspace
-from microstim.utils import maxRadius, normal, plot_tn
-
 import matplotlib.pylab as plt
-import seaborn as sns
+
+from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, DT, R, P, TAU, SYN, ee_linspace, ei_linspace, ii_linspace, ie_linspace
+from microstim.utils import maxRadius, normal, plot_tn
 
 def model(intensity, weights, sigma, rate, boost, is_depolarized=True, gif=False):
     start_time = time.time()
@@ -41,8 +39,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, gif=False
 
     for i in range(0, len(i_RANGE)-1):
 
-        v_e[i+1] = v_e[i] + DT * (-1/TAU * v_e[i] + np.convolve(wee, nu_e[i], mode="same") - np.convolve(wie, nu_i[i], mode="same"))
-        v_i[i+1] = v_i[i] + DT * (-1/TAU * v_i[i] + np.convolve(wei, nu_e[i], mode="same") - np.convolve(wii, nu_i[i], mode="same"))
+        v_e[i+1] = v_e[i] + DT * (-1/TAU * v_e[i] + (np.convolve(wee, nu_e[i], mode="same") - np.convolve(wie, nu_i[i], mode="same"))/SYN)
+        v_i[i+1] = v_i[i] + DT * (-1/TAU * v_i[i] + (np.convolve(wei, nu_e[i], mode="same") - np.convolve(wii, nu_i[i], mode="same"))/SYN)
         
         nu_e[i+1] = rate(v_e[i+1])
         nu_i[i+1] = rate(v_i[i+1])
@@ -54,4 +52,3 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, gif=False
 
     print("%s seconds " % (time.time() - start_time))
     return v_e, v_i, rho_e, rho_i, nu_e, nu_i
-

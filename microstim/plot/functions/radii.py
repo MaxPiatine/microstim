@@ -7,8 +7,8 @@ from microstim.main import model
 from microstim.utils import rect, sigmoid, sigmoidalRect
 
 
-boost = gamma.copy()
-_, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=False)
+boost = start_boost.copy()
+_, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=True)
 # _, _, no_amp, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=False)
 
 sns.set_theme(style="ticks")
