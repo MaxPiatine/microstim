@@ -1,34 +1,43 @@
+import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 
-def draw_rc_circuit():
-    fig, ax = plt.subplots(figsize=(6,4))
-    ax.set_xlim(-2, 2)
-    ax.set_ylim(-1, 2)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.set_frame_on(False)
-    
-    # Draw input voltage source
-    ax.plot([-1.5, -1], [1, 1], 'black', linewidth=2)  # Wire to voltage source
-    ax.add_patch(patches.Rectangle((-1.6, 0.9), 0.2, 0.2, color='black'))  # Voltage source
-    ax.text(-1.8, 1, "V_in", fontsize=12, color='black', verticalalignment='center')
-    
-    # Draw resistor
-    ax.plot([-1, 0], [1, 1], 'black', linewidth=2)  # Wire to resistor
-    ax.add_patch(patches.Rectangle((-0.3, 0.9), 0.6, 0.2, fill=False, edgecolor='black', linewidth=2))  # Resistor
-    ax.text(0, 1.2, "R", fontsize=12, color='black', verticalalignment='center')
-    
-    # Draw capacitor
-    ax.plot([0, 0], [1, 0], 'black', linewidth=2)  # Wire to capacitor
-    ax.plot([-0.3, -0.3], [0, -0.3], 'black', linewidth=2)  # Capacitor plate 1
-    ax.plot([0.3, 0.3], [0, -0.3], 'black', linewidth=2)  # Capacitor plate 2
-    ax.text(0.1, -0.1, "C", fontsize=12, color='black', verticalalignment='center')
-    
-    # Close the circuit
-    ax.plot([-1.5, -1.5], [0, 1], 'black', linewidth=2)  # Wire back to voltage source
-    ax.plot([-1.5, 0], [0, 0], 'black', linewidth=2)  # Bottom wire
-    
-    plt.show()
+# Define the ODE
+def dydt(y):
+    return -2 * y
 
-draw_rc_circuit()
+# Euler method
+def euler_solve(y0, t_end, DT):
+    t = np.arange(0, t_end + DT, DT)  # Time array
+    y = np.zeros_like(t)              # Solution array
+    y[0] = y0                         # Initial condition
+
+    for i in range(1, len(t)):
+        y[i] = y[i-1] + DT * dydt(y[i-1])  # Euler step
+
+    return t, y
+
+# Parameters
+y0 = 1       # Initial condition
+t_end = 5    # End time
+DT1 = 0.1    # Large time step
+DT2 = 0.01   # Small time step
+
+# Solve with two different DeltaT values
+t1, y1 = euler_solve(y0, t_end, DT1)
+t2, y2 = euler_solve(y0, t_end, DT2)
+
+# Exact solution
+t_exact = np.linspace(0, t_end, 1000)
+y_exact = np.exp(-2 * t_exact)
+
+# Plot results
+plt.figure(figsize=(10, 6))
+plt.plot(t_exact, y_exact, label="Exact Solution", color="black", linewidth=2)
+plt.plot(t1, y1, label=f"Euler (DT = {DT1})", marker="o", linestyle="--")
+plt.plot(t2, y2, label=f"Euler (DT = {DT2})", marker="x", linestyle="--")
+plt.xlabel("Time (t)")
+plt.ylabel("y(t)")
+plt.title("Euler Method with Different DeltaT Values")
+plt.legend()
+plt.grid()
+plt.show()

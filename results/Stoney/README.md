@@ -20,7 +20,9 @@ k = \begin{cases}
 \text{inh: } & 0.5
 \end{cases} \\
 
-\Theta = \Pi
+\Theta = \Pi \\
+
+\Delta T = 0.01 ms
 ```
 ![](animation.gif)
 ![alt text](radii.png)

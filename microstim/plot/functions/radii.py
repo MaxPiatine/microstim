@@ -2,13 +2,14 @@ import matplotlib.pylab as plt
 import seaborn as sns
 import os
 
-from microstim.globals import T_RANGE, intensity, sigma, weights, sigma, gamma, start_boost, no_boost, no_boost_weights
-from microstim.main import model
+from microstim.globals import T_RANGE, intensity, sigma, weights, sigma, gamma, start_boost, no_boost, no_boost_weights, DT
+from microstim.main import model, depolModel
 from microstim.utils import rect, sigmoid, sigmoidalRect
 
-
-boost = gamma.copy()
-_, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=False)
+print(DT)
+boost = start_boost.copy()
+# _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=True)
+rho_e, rho_i, _, _ = depolModel(intensity, weights, sigma, boost)
 # _, _, no_amp, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=False)
 
 sns.set_theme(style="ticks")
@@ -22,8 +23,9 @@ ax.spines['right'].set_visible(False)
 plt.plot(T_RANGE, rho_e, color=palette[1], label=r"$\rho_e$")
 plt.plot(T_RANGE, rho_i, color=palette[2], label=r"$\rho_i$")
 
-plt.xlabel("Normalized Time")
+plt.xlabel("time [ms]")
 plt.ylabel(r"Radius [$\mu$m]")
+plt.title(r"$\Delta t$ = " + str(DT) + " ms")
 plt.legend(loc="best")
 # plt.savefig("results/amp1/svg/radii.svg", format="svg", bbox_inches="tight")
 # plt.savefig("results/amp1/radii.png", format="png", bbox_inches="tight")
