@@ -1,5 +1,5 @@
 ### Parameters 
-activation model is not activated with these parameters. It would require gamma to be higher.
+activation model is not activated with these parameters. It would require gamma to be higher. This uses Stoney numpy convolution however different changes for different DTs
 ```math
 \sigma = \begin{cases}
 \text{ee: } & 150\\
