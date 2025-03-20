@@ -8,6 +8,10 @@ from math import sqrt
 from microstim.globals import THRESHOLD, X_RANGE, DT, TAU, SYN
 
 
+"""
+helpful functions
+"""
+
 def maxRadius(ve, vi):
     e_thresh, i_thresh = [], []
     for distance, e_pot, i_pot in zip(X_RANGE, ve, vi):
@@ -16,6 +20,21 @@ def maxRadius(ve, vi):
         if i_pot > THRESHOLD:
             i_thresh.append(distance)
     return max(e_thresh, default=0), max(i_thresh, default=0)
+
+def lognormal(mu, sigma):
+    x_linspace = np.linspace(0, 5, len(X_RANGE))
+    return x_linspace, np.exp(-(np.log(x_linspace)-mu)**2/(2*sigma**2))/(x_linspace*sigma*np.sqrt(2*np.pi))
+
+def lognormalIntensity(x, mu, sigma):
+    k = 8.534
+    
+    mu = 0.74*mu + np.log(k)
+    sigma *= 0.74
+    # print(mu, sigma)
+    return np.exp(-(np.log(k*x**0.74)-mu)**2/(2*sigma**2)) * 0.74/(x*sigma*np.sqrt(2*np.pi))
+
+def diameterCurrentThreshold(diameter):
+    return diameter**1.355/(2*np.exp(2.212))
 
 """
 Rate functions

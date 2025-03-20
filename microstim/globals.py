@@ -4,7 +4,6 @@ import os
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 N = 1000
-N = 1000
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron

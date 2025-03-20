@@ -41,8 +41,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, gif=False
 
     for i in range(0, len(i_RANGE)-1):
 
-        v_e[i+1] = v_e[i] + DT * (-1/TAU * v_e[i] + signal.convolve(wee, nu_e[i], mode="same")/SYN - np.convolve(wie, nu_i[i], mode="same")/SYN)
-        v_i[i+1] = v_i[i] + DT * (-1/TAU * v_i[i] + signal.convolve(wei, nu_e[i], mode="same")/SYN - np.convolve(wii, nu_i[i], mode="same")/SYN)
+        v_e[i+1] = v_e[i] + DT * (-1/TAU * v_e[i] + np.convolve(wee, nu_e[i], mode="same")/SYN - np.convolve(wie, nu_i[i], mode="same")/SYN)
+        v_i[i+1] = v_i[i] + DT * (-1/TAU * v_i[i] + np.convolve(wei, nu_e[i], mode="same")/SYN - np.convolve(wii, nu_i[i], mode="same")/SYN)
 
         # v_e[i+1] = v_e[i] + DT * (-1/TAU * v_e[i] + spectral_convolution(nu_e[i], wee)/SYN - spectral_convolution(nu_i[i], wie)/SYN)
         # v_i[i+1] = v_i[i] + DT * (-1/TAU * v_i[i] + spectral_convolution(nu_e[i], wei)/SYN - spectral_convolution(nu_i[i], wii)/SYN)
@@ -55,16 +55,17 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, gif=False
         if gif:
             plot_tn([v_e[i], v_i[i]], i) # animations
 
-        # fig, axes = plt.subplots(2, 1)
+        fig, axes = plt.subplots(2, 1)
 
-        # # Display images
-        # axes[0].plot(X_RANGE, v_e[i])
-        # axes[0].plot(X_RANGE, nu_e[i])
-        # axes[1].plot(X_RANGE, v_i[i])
-        # axes[1].plot(X_RANGE, nu_i[i])
+        # Display images
+        axes[0].plot(X_RANGE, np.clip(v_e[i], 0, 20))
+        axes[0].plot(X_RANGE, nu_e[i])
+        
+        axes[1].plot(X_RANGE, np.clip(v_i[i], 0, 20))
+        axes[1].plot(X_RANGE, nu_i[i])
 
-        # plt.tight_layout()
-        # plt.show()
+        plt.tight_layout()
+        plt.show()
 
     print("%s seconds " % (time.time() - start_time))
     return v_e, v_i, rho_e, rho_i, nu_e, nu_i

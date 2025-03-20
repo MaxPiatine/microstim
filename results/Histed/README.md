@@ -24,7 +24,10 @@ k = \begin{cases}
 \text{inh: } & 20
 \end{cases} \\
 
-\Theta = \Pi
+\Theta = \Pi\\
+
+\Delta T = 0.01 ms\\
+
 ```
 
 ![](depolarizationAnimation.gif)

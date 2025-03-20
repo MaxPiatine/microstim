@@ -22,7 +22,8 @@ k = \begin{cases}
 
 \Theta = \Pi \\
 
-\Delta T = 0.01 ms
+\Delta T = 0.01 ms\\
+
 ```
 ![](animation.gif)
 ![alt text](radii.png)
