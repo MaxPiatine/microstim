@@ -21,9 +21,8 @@ def maxRadius(ve, vi):
             i_thresh.append(distance)
     return max(e_thresh, default=0), max(i_thresh, default=0)
 
-def lognormal(mu, sigma):
-    x_linspace = np.linspace(0, 5, len(X_RANGE))
-    return x_linspace, np.exp(-(np.log(x_linspace)-mu)**2/(2*sigma**2))/(x_linspace*sigma*np.sqrt(2*np.pi))
+def lognormal(x, mu, sigma):
+    return np.exp(-(np.log(x)-mu)**2/(2*sigma**2))/(x*sigma*np.sqrt(2*np.pi))
 
 def lognormalIntensity(x, mu, sigma):
     k = 8.534

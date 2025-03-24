@@ -3,6 +3,7 @@ import seaborn as sns
 import numpy as np
 from scipy.integrate import simps
 from scipy.integrate import quad
+import math
 
 from microstim.utils import lognormal, lognormalIntensity, diameterCurrentThreshold
 from microstim.globals import X_RANGE
@@ -10,12 +11,12 @@ from microstim.globals import X_RANGE
 mu_e, mu_i = 0.712, 0.465
 sigma_e, sigma_i = 0.292, 0.114
 
-sns.set_theme(style="ticks")
-palette = sns.color_palette("mako_r", n_colors=3) 
+# sns.set_theme(style="ticks")
+# palette = sns.color_palette("mako_r", n_colors=3) 
 
-ax = plt.subplot(111) 
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
+# ax = plt.subplot(111) 
+# ax.spines['top'].set_visible(False)
+# ax.spines['right'].set_visible(False)
 
 # samples1 = np.random.normal(loc=mu_e, scale=sigma_e, size=10000)
 # samples2 = np.random.normal(loc=mu_i, scale=sigma_i, size=10000)
@@ -34,24 +35,35 @@ ax.spines['right'].set_visible(False)
 # plt.hist(samples2, bins=bins2, density=True, alpha=0.4, color=palette[1], label="inh")
 # plt.plot(np.linspace(0, max(samples), 30), 1/(sigma_e * np.sqrt(2 * np.pi)) * np.exp( - (bins - mu_e)**2 / (2 * sigma_e**2) ), linewidth=2, color="k")
 
-a = diameterCurrentThreshold(diameter=12)
-print(a)
-x_linspace = np.linspace(0, 5, len(X_RANGE))
-lognrml_e = lognormalIntensity(x_linspace, mu=0.712, sigma=0.292)
-lognrml_i = lognormalIntensity(x_linspace, mu=0.465, sigma=0.114)
-
-integral_a = 0
+# a = diameterCurrentThreshold(diameter=12)
+# print(a)
+x_linspace = np.linspace(0.01, 10, len(X_RANGE))
+val = 0
 for x in x_linspace:
-    print(integral_a)
-    integral_a += lognormalIntensity(x, mu=0.712, sigma=0.292)
+    new_val = lognormal(x, mu_e, sigma_e)
+    if math.isnan(new_val):
+        continue
+    val += new_val
+print(val)
+# lognrml_e = lognormalIntensity(x_linspace, mu=0.712, sigma=0.292)
+# lognrml_i = lognormalIntensity(x_linspace, mu=0.465, sigma=0.114)
 
-print("Integral from 0 to a: ", integral_a)
+# integral_a = 0
+# for x in x_linspace:
+#     if x < a:
+#         print(integral_a)
+#         val = lognormalIntensity(x, mu=0.712, sigma=0.292)
+#         if math.isnan(val):
+#             continue
+#         integral_a += val
+    
 
-plt.plot(x_linspace, lognrml_e, color=palette[0], label="exc")
-plt.plot(x_linspace, lognrml_i, color=palette[1], label="inh")
-plt.fill_between(x_linspace, lognrml_e, where=(x_linspace < a), color='grey', alpha=0.3)
-plt.axvline(a, color='black', linestyle='--', label=r"$I_T$")
-plt.xlabel("intensity threshold [μA]")
-plt.ylabel("probability density")
-plt.legend(loc="best")
-plt.show()
+# print("Integral from 0 to a: ", integral_a)
+
+# plt.plot(x_linspace, lognrml_e/lognrml_i, color=palette[0], label="exc/inh")
+# plt.fill_between(x_linspace, lognrml_e, where=(x_linspace < a), color='grey', alpha=0.3)
+# plt.axvline(a, color='black', linestyle='--', label=r"$I_T$")
+# plt.xlabel("intensity threshold [μA]")
+# plt.ylabel("ratio E/I")
+# plt.legend(loc="best")
+# plt.show()
