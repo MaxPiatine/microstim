@@ -24,16 +24,22 @@ def maxRadius(ve, vi):
 def lognormal(x, mu, sigma):
     return np.exp(-(np.log(x)-mu)**2/(2*sigma**2))/(x*sigma*np.sqrt(2*np.pi))
 
-def lognormalIntensity(x, mu, sigma):
-    k = 8.534
-    
-    mu = 0.74*mu + np.log(k)
-    sigma *= 0.74
-    # print(mu, sigma)
-    return np.exp(-(np.log(k*x**0.74)-mu)**2/(2*sigma**2)) * 0.74/(x*sigma*np.sqrt(2*np.pi))
+def lognormalIntensity(i, rheobase, time, mu_d, sigma_d, diameter=None):
+    mean_T = rheobase*(1+np.exp(2.212-0.355*mu_d+0.063*sigma_d**2)/time)
+    if not diameter:
+        diameter = mu_d
+    sigma_T = np.sqrt(0.124*np.exp(2*2.212)*diameter**(-2*1.355)*(np.exp(sigma_d**2)-1)*np.exp(2*mu_d+sigma_d**2)/time*2)
+    # print(mean_T, sigma_T)
+    return (200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(i-rheobase) * np.exp(-(200*np.log(rheobase/((i-rheobase)*time))/71 - mean_T)**2/(2*sigma_T**2))
 
-def diameterCurrentThreshold(diameter):
-    return diameter**1.355/(2*np.exp(2.212))
+def diameter2Threshold(diameter, rheobase, time):
+    return rheobase*(1+np.exp(2.212)/(time*diameter**0.355))
+
+def threshold2Diameter(I_T, rheobase, time):
+    return (rheobase*np.exp(2.212)/(time*(I_T-rheobase)))**(1/0.355)
+
+def chronoxie(diameter):
+    return np.exp(2.212)/diameter**0.255
 
 """
 Rate functions

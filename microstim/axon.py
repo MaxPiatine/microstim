@@ -1,69 +1,95 @@
 import matplotlib.pylab as plt
 import seaborn as sns
 import numpy as np
-from scipy.integrate import simps
-from scipy.integrate import quad
 import math
 
-from microstim.utils import lognormal, lognormalIntensity, diameterCurrentThreshold
+from microstim.utils import lognormal, lognormalIntensity, diameter2Threshold, normal, threshold2Diameter, chronoxie
 from microstim.globals import X_RANGE
 
-mu_e, mu_i = 0.712, 0.465
+linspace = np.linspace(0.01, 2, len(X_RANGE))
+step = linspace[1] - linspace[0]
+checkNormalized = True
+mu_e, mu_i = 0.712, 0.465 #microns
 sigma_e, sigma_i = 0.292, 0.114
+rheobase = 0.8
 
-# sns.set_theme(style="ticks")
-# palette = sns.color_palette("mako_r", n_colors=3) 
+diameter_wanted = mu_e + 2*sigma_e #microns
+pulse = 20 #micro s #chronoxie(diameter_wanted) #10 #ms
+thresh_wanted = 0.87 #diameter2Threshold(diameter_wanted, rheobase, pulse)
 
-# ax = plt.subplot(111) 
-# ax.spines['top'].set_visible(False)
-# ax.spines['right'].set_visible(False)
+print("Between 0.801 microAmp (diameter=", threshold2Diameter(0.801, rheobase, pulse),  " microns) and 1 microamp (diameter=", threshold2Diameter(1, rheobase, pulse), " microns) for 0.8 microAmp rheobase and 10 microsecond stim")
 
-# samples1 = np.random.normal(loc=mu_e, scale=sigma_e, size=10000)
-# samples2 = np.random.normal(loc=mu_i, scale=sigma_i, size=10000)
-# bins1 = np.linspace(0, max(samples1), 30)
-# bins2 = np.linspace(0, max(samples2), 30)
-# plt.hist(samples1, bins=bins1, density=True, alpha=0.5, color=palette[0], label="exc")
-# plt.hist(samples2, bins=bins2, density=True, alpha=0.4, color=palette[1], label="inh")
-# plt.plot(np.linspace(0, max(samples), 30), 1/(sigma_e * np.sqrt(2 * np.pi)) * np.exp( - (bins - mu_e)**2 / (2 * sigma_e**2) ), linewidth=2, color="k")
+if checkNormalized:
+    isNormal = 0
+    for x in linspace:
+            val = lognormalIntensity(x, rheobase=rheobase, time=pulse, mu_d=mu_e, sigma_d=sigma_e)
+            if math.isnan(val):
+                continue
+            isNormal += val * (linspace[1]-linspace[0])
 
 
-# samples1 = np.random.lognormal(mean=mu_e, sigma=sigma_e, size=10000)
-# samples2 = np.random.lognormal(mean=mu_i, sigma=sigma_i, size=10000)
-# bins1 = np.linspace(0, max(samples1), 30)
-# bins2 = np.linspace(0, max(samples2), 30)
-# plt.hist(samples1, bins=bins1, density=True, alpha=0.5, color=palette[0], label="exc")
-# plt.hist(samples2, bins=bins2, density=True, alpha=0.4, color=palette[1], label="inh")
-# plt.plot(np.linspace(0, max(samples), 30), 1/(sigma_e * np.sqrt(2 * np.pi)) * np.exp( - (bins - mu_e)**2 / (2 * sigma_e**2) ), linewidth=2, color="k")
+    print("is it normalized?: ", isNormal)
 
-# a = diameterCurrentThreshold(diameter=12)
-# print(a)
-x_linspace = np.linspace(0.01, 10, len(X_RANGE))
-val = 0
-for x in x_linspace:
-    new_val = lognormal(x, mu_e, sigma_e)
-    if math.isnan(new_val):
+print("diameter, ", diameter_wanted, " to threshold: ", diameter2Threshold(diameter_wanted, rheobase, pulse))
+print("chronoxie: ", chronoxie(diameter_wanted))
+
+sns.set_theme(style="ticks")
+palette = sns.color_palette("mako_r", n_colors=3) 
+
+ax = plt.subplot(111) 
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+
+lognrml_e = lognormalIntensity(linspace, rheobase=rheobase, time=pulse, mu_d=mu_e, sigma_d=sigma_e)
+lognrml_i = lognormalIntensity(linspace, rheobase=rheobase, time=pulse, mu_d=mu_i, sigma_d=sigma_i)
+
+integral_e = 0
+ratio_e = np.zeros(len(X_RANGE))
+for i, x in enumerate(linspace):
+    val = lognormalIntensity(x, rheobase=rheobase, time=pulse, mu_d=mu_e, sigma_d=sigma_e)
+    if math.isnan(val):
         continue
-    val += new_val
-print(val)
-# lognrml_e = lognormalIntensity(x_linspace, mu=0.712, sigma=0.292)
-# lognrml_i = lognormalIntensity(x_linspace, mu=0.465, sigma=0.114)
+    else:
+        ratio_e[i] = val * step
+        
+    if x < thresh_wanted:
+        integral_e += val * step
 
-# integral_a = 0
-# for x in x_linspace:
-#     if x < a:
-#         print(integral_a)
-#         val = lognormalIntensity(x, mu=0.712, sigma=0.292)
-#         if math.isnan(val):
-#             continue
-#         integral_a += val
+
+# print("Integral from 0 to a: ", integral_e)
+print("Ratio of E: ", integral_e)
+
+integral_i = 0
+ratio_i = np.zeros(len(X_RANGE))
+for i, x in enumerate(linspace):
+    val = lognormalIntensity(x, rheobase=rheobase, time=pulse, mu_d=mu_i, sigma_d=sigma_i)
+    if math.isnan(val):
+        continue
+    else:
+        ratio_i[i] = val * step
     
+    if x < thresh_wanted:
+        integral_i += val * step
+        
+        
 
-# print("Integral from 0 to a: ", integral_a)
+# print("Integral from 0 to b: ", integral_b)
+print("Ratio of I: ", integral_i)
 
-# plt.plot(x_linspace, lognrml_e/lognrml_i, color=palette[0], label="exc/inh")
-# plt.fill_between(x_linspace, lognrml_e, where=(x_linspace < a), color='grey', alpha=0.3)
-# plt.axvline(a, color='black', linestyle='--', label=r"$I_T$")
-# plt.xlabel("intensity threshold [μA]")
-# plt.ylabel("ratio E/I")
+print("ratio between I/E: ", integral_i/integral_e)
+
+
+plt.plot(linspace, lognrml_e, color=palette[0], label="exc")
+plt.plot(linspace, lognrml_i, color=palette[1], label="inh")
+plt.fill_between(linspace, lognrml_i, where=(linspace < thresh_wanted), color='grey', alpha=0.3)
+plt.axvline(thresh_wanted, color='black', linestyle='--', label=r"$I_T$")
+# plt.plot(linspace, ratio_i/ratio_e, color=palette[0])
+# plt.plot([thresh_wanted], [integral_i/integral_e], marker="o", color=palette[1])
+plt.xlabel("intensity threshold [μA]")
+# plt.ylabel("I/E Ratio")
+plt.ylabel("probability")
+# plt.plot(a, integral_a/integral_b)
+# plt.xlim([0.86,0.88])
+# plt.ylim([0.5,20])
 # plt.legend(loc="best")
-# plt.show()
+plt.show()
