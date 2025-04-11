@@ -2,8 +2,8 @@ import matplotlib.pylab as plt
 import matplotlib.animation as animation
 import numpy as np
 
-from microstim.globals import intensity, sigma, weights, sigma, gamma, start_boost, current_dir
-from microstim.main import model, depolModel
+from microstim.globals import intensity, act_sigma, act_weights, depol_sigma, depol_weights, gamma, start_boost, current_dir
+from microstim.main import model
 from microstim.utils import rect, sigmoid, sigmoidalRect
 
 from PIL import Image
@@ -12,9 +12,19 @@ import os
 
 files_path = current_dir + "/plot/results/"
 
-boost = start_boost.copy()
-v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, boost, is_depolarized=True, gif=True)
-rho_e, rho_i, v_e, v_i = depolModel(intensity, weights, sigma, boost)
+is_depol = True
+is_test = True
+if is_depol:
+    boost = start_boost.copy()
+    weights = depol_weights.copy()
+    sigma = depol_sigma.copy()
+else:
+    boost = gamma.copy()
+    weights = act_weights.copy()
+    sigma = act_sigma.copy()
+    
+
+v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depol)
 
 
 files = sorted(glob.glob("./microstim/plot/results/*.png"), key=os.path.getmtime)
@@ -35,7 +45,9 @@ animated = animation.FuncAnimation(
 )
 
 # Save the animation as a GIF
-# animated.save("./results/master/newgif.gif", writer="pillow", fps=30)
+if not is_test:
+    animated.save("./results/master/newgif.gif", writer="pillow", fps=30)
+    
 list(map(os.remove, glob.glob(os.path.join(files_path, "*.png"))))
 os.system('say "Potential GIF finished"')
 plt.show()

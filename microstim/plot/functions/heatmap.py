@@ -4,7 +4,7 @@ import seaborn as sns
 import os
 
 from microstim.main import model
-from microstim.globals import weights, sigma, intensity, start_boost, gamma
+from microstim.globals import act_weights, act_sigma, intensity, start_boost, gamma
 from microstim.utils import rect
 
 Wei_RANGE = np.arange(100, 300, 25)

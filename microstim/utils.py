@@ -1,4 +1,5 @@
 import gc
+import torch
 import numpy as np
 import seaborn as sns
 import matplotlib.pylab as plt
@@ -12,14 +13,18 @@ from microstim.globals import THRESHOLD, X_RANGE, DT, TAU, SYN
 helpful functions
 """
 
-def maxRadius(ve, vi):
-    e_thresh, i_thresh = [], []
-    for distance, e_pot, i_pot in zip(X_RANGE, ve, vi):
-        if e_pot > THRESHOLD:
-            e_thresh.append(distance)
-        if i_pot > THRESHOLD:
-            i_thresh.append(distance)
-    return max(e_thresh, default=0), max(i_thresh, default=0)
+@torch.jit.script
+def maxRadius(v, x_range: torch.Tensor, threshold: int):
+    # Find the last index where value > threshold
+    mask = v > threshold
+    
+    # Get the last index where mask is True
+    max_idx = torch.argmax(mask.to(torch.int32) * torch.arange(len(v), device=v.device))
+    
+    # Get the corresponding x_range values
+    x_max = torch.where(torch.any(mask), x_range[max_idx], torch.tensor(0.0, device=v.device))
+    
+    return x_max  
 
 def lognormal(x, mu, sigma):
     return np.exp(-(np.log(x)-mu)**2/(2*sigma**2))/(x*sigma*np.sqrt(2*np.pi))
@@ -45,13 +50,14 @@ def chronoxie(diameter):
 Rate functions
 """
 def normal(x, sigma):
-    return np.exp(-(x)**2/(2 * sigma**2)) / np.sqrt(2 * np.pi * sigma**2)
+    sigma_tensor = torch.tensor(sigma, dtype=torch.float32, device=x.device)
+    return torch.exp(-(x)**2/(2 * sigma_tensor**2)) / torch.sqrt(2 * torch.pi * sigma_tensor**2)
     
 def sigmoid(v):
     return 1 / (1 + np.exp(-(THRESHOLD - v)))
 
 def rect(v):
-    return np.where(v >= THRESHOLD, 1, 0)
+    return torch.where(v >= THRESHOLD, 1, 0)
 
 def sigmoidalRect(v):
     x = rect(v)

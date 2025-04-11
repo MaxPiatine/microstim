@@ -4,37 +4,56 @@ import seaborn as sns
 import os
 
 from microstim.main import model
-from microstim.globals import weights, sigma, intensity, start_boost, gamma, X_RANGE, T_RANGE
+from microstim.globals import act_weights, act_sigma, depol_weights, depol_sigma, intensity, start_boost, gamma, X_RANGE, T_RANGE
 from microstim.utils import rect
 
+is_depol = True
+is_test = True
 
-heatmap = np.zeros((len(X_RANGE), len(T_RANGE)))
-boost = start_boost.copy()
-v_e, _, _, _, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=True)
+if is_depol:
+    boost = start_boost.copy()
+    weights = depol_weights.copy()
+    sigma = depol_sigma.copy()
+else:
+    boost = gamma.copy()
+    weights = act_weights.copy()
+    sigma = act_sigma.copy()
+    
+v_e, _, _, _, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depol)
 
-for x, t in enumerate(T_RANGE):
-    print(t)
-    for y, distance in enumerate(X_RANGE):
-        heatmap[y][x] += 20 if v_e[x][y] > 20 else (-10 if v_e[x][y] < -10 else v_e[x][y])
+# Create figure with high resolution
+fig, ax = plt.subplots()
+# fig.set_dpi(900)  # increase resolution
 
-print("plotting")
-# Create the heatmap using seaborn
-plt.figure(figsize=(8, 6))
-# ax = sns.heatmap(
-#     heatmap,
-#     xticklabels=np.round(T_RANGE, 2),  
-#     yticklabels=np.round(X_RANGE, 2),  
-#     linewidths=0.5, 
-# )
+# Process the voltage data
+# Set spike value (if you have spikes)
+v_e[v_e > 20.0] = 20  # set height for spikes
+# Set min value
+v_e[v_e < -10.0] = -10
 
-plt.imshow(heatmap, origin="lower", cmap="RdBu", interpolation="nearest", aspect="auto")
-plt.colorbar()
 
-# ax.invert_yaxis()
+# Create custom colormap using seaborn
+cmap = sns.color_palette("icefire", as_cmap=True)
 
-# ax.set_xlabel("normalized time")
-# ax.set_ylabel(r"distance $\mu m$")
+# Create contour plot
+cs = ax.contourf(T_RANGE, X_RANGE, v_e.T, 
+                cmap=cmap,  # or 'bwr', 'seismic', 'berlin', etc.
+                extend='both',
+                alpha=0.7)
 
+# Add labels
+ax.set_xlabel("Time (ms)")
+ax.set_ylabel("Distance (μm)")
+fig.suptitle("Sub-threshold voltage by distance and time")
+
+# Set axis limits
+ax.set_xlim(right=max(T_RANGE))
+ax.set_ylim(top=max(X_RANGE))
+
+# Add colorbar
+cbar = fig.colorbar(cs, label="Voltage (mV)")
+
+# Save the plot
 print("saving")
 plt.savefig("results/master/svg/potHeat.svg", format="svg", bbox_inches="tight")
 plt.savefig("results/master/potHeat.png", format="png", bbox_inches="tight")
