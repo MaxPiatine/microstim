@@ -79,6 +79,5 @@ gamma = {
 """
 Axon Dynamics
 """
-mu_e, mu_i = 0.712, 0.465 #microns
-sigma_e, sigma_i = 0.292, 0.292
-rheobase = 0.8
+mu_e, mu_i = 0.45, 0.54 #microns
+sigma_e, sigma_i = 0.001, 0.001

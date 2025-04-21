@@ -6,8 +6,6 @@ import time
 from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, R, P, DT, TAU, SYN, THRESHOLD
 from microstim.utils import maxRadius, normal, plot_tn, k_e, k_i, spectral_convolution, KernelConvolution
 
-import matplotlib.pylab as plt
-
 usingFFT = False
 gif = False
 

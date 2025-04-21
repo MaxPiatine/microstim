@@ -1,20 +1,20 @@
-import matplotlib.pylab as plt
-import seaborn as sns
-import numpy as np
 import math
 
-from microstim.utils import lognormal, lognormalIntensity, diameter2Threshold, normal, threshold2Diameter, chronoxie
-from microstim.globals import X_RANGE
+from microstim.utils import intensityPDF, ConvertDiameterMean, ConvertDiameterSigma
+from microstim.globals import X_RANGE, mu_e, mu_i, sigma_e, sigma_i
 
 checkNormalized = False
 
-def axon(rheobase, mu_e, mu_i, sigma_e, sigma_i, pulse, thresh_wanted):
-    linspace = np.linspace(0.8, 2, len(X_RANGE))
+def axon(linspace, rheobase, pulse, thresh_wanted):
+    # print("exc threshold mean", ConvertDiameterMean(rheobase, pulse, mu_e, sigma_e))
+    # print("inh threshold mean", ConvertDiameterMean(rheobase, pulse, mu_i, sigma_i))
+    # print("exc threshold sigma", ConvertDiameterSigma(rheobase, pulse, mu_e, sigma_e))
+    # print("inh threshold sigma", ConvertDiameterSigma(rheobase, pulse, mu_i, sigma_i))
     step = linspace[1] - linspace[0]
     if checkNormalized:
         isNormal = 0
         for x in linspace:
-                val = lognormalIntensity(x, rheobase=rheobase, time=pulse, mu_d=mu_e, sigma_d=sigma_e)
+                val = intensityPDF(x, rheobase=rheobase, time=pulse, mu_d=mu_e, sigma_d=sigma_e, isTest=checkNormalized)
                 if math.isnan(val):
                     continue
                 isNormal += val * (linspace[1]-linspace[0])
@@ -22,8 +22,8 @@ def axon(rheobase, mu_e, mu_i, sigma_e, sigma_i, pulse, thresh_wanted):
 
         print("is it normalized?: ", isNormal)
 
-    lognrml_e = lognormalIntensity(linspace, rheobase=rheobase, time=pulse, mu_d=mu_e, sigma_d=sigma_e)
-    lognrml_i = lognormalIntensity(linspace, rheobase=rheobase, time=pulse, mu_d=mu_i, sigma_d=sigma_i)
+    lognrml_e = intensityPDF(linspace, rheobase=rheobase, time=pulse, mu_d=mu_e, sigma_d=sigma_e)
+    lognrml_i = intensityPDF(linspace, rheobase=rheobase, time=pulse, mu_d=mu_i, sigma_d=sigma_i)
 
     ratio_e = 0
     for i, x in enumerate(linspace):

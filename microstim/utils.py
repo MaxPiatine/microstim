@@ -8,6 +8,9 @@ from math import sqrt
 
 from microstim.globals import THRESHOLD, X_RANGE, DT, TAU, SYN
 
+# Boost and Hinder are used to manipulate the intensity pdf 
+boost = 1
+hinder = 100
 
 """
 helpful functions
@@ -29,22 +32,30 @@ def maxRadius(v, x_range: torch.Tensor, threshold: int):
 def lognormal(x, mu, sigma):
     return np.exp(-(np.log(x)-mu)**2/(2*sigma**2))/(x*sigma*np.sqrt(2*np.pi))
 
-def lognormalIntensity(i, rheobase, time, mu_d, sigma_d, diameter=None):
-    mean_T = rheobase*(1+np.exp(2.212-0.355*mu_d+0.063*sigma_d**2)/time)
-    if not diameter:
-        diameter = mu_d
-    sigma_T = np.sqrt(0.124*np.exp(2*2.212)*diameter**(-2*1.355)*(np.exp(sigma_d**2)-1)*np.exp(2*mu_d+sigma_d**2)/time*2)
-    # print(mean_T, sigma_T)
-    return (200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(i-rheobase) * np.exp(-(200*np.log(rheobase/((i-rheobase)*time))/71 - mean_T)**2/(2*sigma_T**2))
+def intensityPDF(intensity, rheobase, time, mu_d, sigma_d, isTest=False):
+    mean_T = rheobase*(1+np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2/2)/time)/hinder
+    sigma_T = np.sqrt((rheobase/time)**2 * np.exp(4.424 - 0.71*mu_d) * (np.exp((0.71*sigma_d)**2/2)-np.exp((0.355*sigma_d)**2)))
+    
+    if isTest:
+        print(f"\nDebug values:")
+        mean_exp = np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2)
+        print(f"mean exp: {mean_exp}", f"rheobase: {rheobase*mean_exp}", f"mean_T: {mean_T}")
+        print(f"sigma_T: {sigma_T}")
+    log_arg = rheobase*np.exp(2.212)/((intensity-rheobase)*time)
+    log_term = np.log(log_arg)
+    if isTest:
+        print(f"200*log_term/71: {200*log_term/71}")
+        print(f"exponent: {-(200*log_term/71 - mean_T)**2/(2*sigma_T**2)}")
+        print(f"exp(exponent): {np.exp(-(200*log_term/71 - mean_T)**2/(2*sigma_T**2))}")
+        print(f"coefficient: {(200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(intensity-rheobase)}")
+    
+    return (200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(intensity-rheobase) * np.exp(-(boost*200*np.log(rheobase*np.exp(2.212)/((intensity-rheobase)*time))/71 - mean_T)**2/(2*sigma_T**2))
 
-def diameter2Threshold(diameter, rheobase, time):
-    return rheobase*(1+np.exp(2.212)/(time*diameter**0.355))
+def ConvertDiameterMean(rheobase, time, mu_d, sigma_d):
+    return rheobase*(1+np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2/2)/time)
 
-def threshold2Diameter(I_T, rheobase, time):
-    return (rheobase*np.exp(2.212)/(time*(I_T-rheobase)))**(1/0.355)
-
-def chronoxie(diameter):
-    return np.exp(2.212)/diameter**0.255
+def ConvertDiameterSigma(rheobase, time, mu_d, sigma_d):
+    return np.sqrt((rheobase/time)**2 * np.exp(4.424 - 0.71*mu_d) * (np.exp((0.71*sigma_d)**2/2)-np.exp((0.355*sigma_d)**2)))
 
 """
 Rate functions
@@ -105,9 +116,9 @@ def plot_tn(responses, n):
     gc.collect()
 
 
-    """
-    Runge-Kutta
-    """
+"""
+Runge-Kutta
+"""
 def dv_e_dt(v_e, nu_e, nu_i, wee, wie):
     return (-v_e/TAU + (np.convolve(wee, nu_e, mode="same") - np.convolve(wie, nu_i, mode="same"))/SYN)
 

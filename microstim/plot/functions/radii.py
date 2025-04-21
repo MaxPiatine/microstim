@@ -8,16 +8,19 @@ from microstim.utils import rect, sigmoid, sigmoidalRect
 
 print(DT)
 is_depol = True
-is_test = True
+is_test = False
+typeModel = ""
 
 if is_depol:
     boost = start_boost.copy()
     weights = depol_weights.copy()
     sigma = depol_sigma.copy()
+    typeModel += "Depol"
 else:
     boost = gamma.copy()
     weights = act_weights.copy()
     sigma = act_sigma.copy()
+    typeModel += "Act"
     
 _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depol, radius_only=True)
 
@@ -42,7 +45,6 @@ plt.title(r"$\Delta t$ = " + str(DT) + " ms")
 plt.legend(loc="best")
 
 if not is_test:
-    plt.savefig("results/amp1/svg/radii.svg", format="svg", bbox_inches="tight")
-    plt.savefig("results/amp1/radii.png", format="png", bbox_inches="tight")
-os.system('say "Radii finished"')
-plt.show()
+    plt.savefig("results/master/svg/"+typeModel+"radii.svg", format="svg", bbox_inches="tight")
+    plt.savefig("results/master/"+typeModel+"radii.png", format="png", bbox_inches="tight")
+
