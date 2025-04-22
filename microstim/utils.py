@@ -6,7 +6,7 @@ import matplotlib.pylab as plt
 from scipy.special import erf
 from math import sqrt
 
-from microstim.globals import THRESHOLD, X_RANGE, DT, TAU, SYN
+from microstim.globals import THRESHOLD, X_RANGE, DT, TAU, SYN, RHEOBASE, PULSE
 
 # Boost and Hinder are used to manipulate the intensity pdf 
 boost = 1
@@ -32,30 +32,33 @@ def maxRadius(v, x_range: torch.Tensor, threshold: int):
 def lognormal(x, mu, sigma):
     return np.exp(-(np.log(x)-mu)**2/(2*sigma**2))/(x*sigma*np.sqrt(2*np.pi))
 
-def intensityPDF(intensity, rheobase, time, mu_d, sigma_d, isTest=False):
-    mean_T = rheobase*(1+np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2/2)/time)/hinder
-    sigma_T = np.sqrt((rheobase/time)**2 * np.exp(4.424 - 0.71*mu_d) * (np.exp((0.71*sigma_d)**2/2)-np.exp((0.355*sigma_d)**2)))
+def intensityTreshold(diameter):
+    return RHEOBASE*(1+np.exp(2.212)/(PULSE*diameter**0.355))
+
+def intensityPDF(intensity, mu_d, sigma_d, isTest=False):
+    mean_T = RHEOBASE*(1+np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2/2)/PULSE)/hinder
+    sigma_T = np.sqrt((RHEOBASE/PULSE)**2 * np.exp(4.424 - 0.71*mu_d) * (np.exp((0.71*sigma_d)**2/2)-np.exp((0.355*sigma_d)**2)))
     
     if isTest:
         print(f"\nDebug values:")
         mean_exp = np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2)
-        print(f"mean exp: {mean_exp}", f"rheobase: {rheobase*mean_exp}", f"mean_T: {mean_T}")
+        print(f"mean exp: {mean_exp}", f"rheobase: {RHEOBASE*mean_exp}", f"mean_T: {mean_T}")
         print(f"sigma_T: {sigma_T}")
-    log_arg = rheobase*np.exp(2.212)/((intensity-rheobase)*time)
+    log_arg = RHEOBASE*np.exp(2.212)/((intensity-RHEOBASE)*PULSE)
     log_term = np.log(log_arg)
     if isTest:
         print(f"200*log_term/71: {200*log_term/71}")
         print(f"exponent: {-(200*log_term/71 - mean_T)**2/(2*sigma_T**2)}")
         print(f"exp(exponent): {np.exp(-(200*log_term/71 - mean_T)**2/(2*sigma_T**2))}")
-        print(f"coefficient: {(200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(intensity-rheobase)}")
+        print(f"coefficient: {(200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(intensity-RHEOBASE)}")
     
-    return (200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(intensity-rheobase) * np.exp(-(boost*200*np.log(rheobase*np.exp(2.212)/((intensity-rheobase)*time))/71 - mean_T)**2/(2*sigma_T**2))
+    return (200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(intensity-RHEOBASE) * np.exp(-(boost*200*np.log(RHEOBASE*np.exp(2.212)/((intensity-RHEOBASE)*PULSE))/71 - mean_T)**2/(2*sigma_T**2))
 
-def ConvertDiameterMean(rheobase, time, mu_d, sigma_d):
-    return rheobase*(1+np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2/2)/time)
+def ConvertDiameterMean(mu_d, sigma_d):
+    return RHEOBASE*(1+np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2/2)/PULSE)
 
-def ConvertDiameterSigma(rheobase, time, mu_d, sigma_d):
-    return np.sqrt((rheobase/time)**2 * np.exp(4.424 - 0.71*mu_d) * (np.exp((0.71*sigma_d)**2/2)-np.exp((0.355*sigma_d)**2)))
+def ConvertDiameterSigma(mu_d, sigma_d):
+    return np.sqrt((RHEOBASE/PULSE)**2 * np.exp(4.424 - 0.71*mu_d) * (np.exp((0.71*sigma_d)**2/2)-np.exp((0.355*sigma_d)**2)))
 
 """
 Rate functions
