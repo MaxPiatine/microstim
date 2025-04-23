@@ -1,10 +1,9 @@
 import matplotlib.pylab as plt
-from matplotlib.colors import ListedColormap
 import seaborn as sns
 import numpy as np
 
 from microstim.axon import axon
-from microstim.globals import MU_E, MU_I, STDEV_E, STDEV_I, ALPHA
+from microstim.globals import MU_E, MU_I, STDEV_E, STDEV_I, ALPHA, RHEOBASE
 
 """
 we have a slice of 500 x 500 microns and we want to see how many axons will be recruited.
@@ -17,7 +16,7 @@ If we minimally assume that there is 1 axon to each neuron then we would have
 
 np.random.seed(2)
 
-intensity = 10 #microAmp mm
+intensity = np.arange(RHEOBASE, 20) #microAmp mm
 
 # Parameters
 micron_range = 200       # total area in microns
