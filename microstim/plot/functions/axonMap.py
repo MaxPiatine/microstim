@@ -5,7 +5,7 @@ import numpy as np
 
 from microstim.axon import axon
 from microstim.utils import intensityTreshold
-# from microstim.globals import MU_E, MU_I, STDEV_E, STDEV_I
+from microstim.globals import MU_E, MU_I, STDEV_E, STDEV_I, ALPHA
 
 """
 we have a slice of 500 x 500 microns and we want to see how many axons will be recruited.
@@ -15,9 +15,7 @@ Inhibitory neurons make up ~15-20%
 If we minimally assume that there is 1 axon to each neuron then we would have
 1063 excitatory axons vs 188 inhibitory neurons in a slice
 """
-intensity = 1000 #microAmp mm
-mu_e, mu_i = 0.678, 1.28
-sigma_e, sigma_i = 0.258, 0.1
+intensity = 1.2 #microAmp mm
 
 # Parameters
 micron_range = 200       # total area in microns
@@ -25,7 +23,7 @@ res = 0.1               # resolution: microns per pixel
 grid_size = int(micron_range / res)  # 500
 half_grid = grid_size // 2
 num_axons = 100
-stim_radius_microns = 1  # stimulation radius in microns
+stim_radius_microns = 1 + ALPHA  # stimulation radius in microns
 stim_radius = int(stim_radius_microns / res)  # in pixels
 
 # https://www.eneuro.org/content/5/5/ENEURO.0297-18.2018#:~:text=The%20nodes%20of%20Ranvier%20(Rasband,n%20=%20100%20nonGABA%20nodes%20from
@@ -63,20 +61,22 @@ while placed_axons < num_axons and attempts < max_attempts:
 
     if np.random.random() > 0.4:
         axon_type = 1
-        radius_microns = np.random.lognormal(mu_e, sigma_e)
+        diameter = np.random.lognormal(MU_E, STDEV_E)
+        radius_microns = diameter / 2
         radius = int(np.round(radius_microns / res)) 
 
-        _, _, ratio_e, _ = axon(intensity/distance)
+        _, _, ratio_e, _ = axon(intensity/distance, diameter)
 
         # temporary solution, don't think this works as well as the pdf ratio
-        ratios_e += 1 if intensity/distance >= intensityTreshold(2*radius) else 0
+        ratios_e += ratio_e
     else:
         axon_type = -1
-        radius_microns = np.random.lognormal(mu_i, sigma_i)
+        diameter = np.random.lognormal(MU_I, STDEV_I)
+        radius_microns = diameter / 2
         radius = int(np.round(radius_microns / res)) 
-        _, _, ratio_i, _ = axon(intensity/distance)
+        _, _, ratio_i, _ = axon(intensity/distance, diameter)
 
-        ratios_i += 1 if intensity/distance >= intensityTreshold(2*radius) else 0
+        ratios_i += ratio_i
 
 
     # Calculate bounding box
@@ -101,7 +101,7 @@ while placed_axons < num_axons and attempts < max_attempts:
 try:
     ratio = ratios_i/ratios_e
 except ZeroDivisionError:
-    ratio = ratios_e
+    ratio = ratios_i
 
 print(f"ratio of excitatory {ratios_e}, and inhibitory {ratios_i} => the recruitment ratio {ratio}")
 
