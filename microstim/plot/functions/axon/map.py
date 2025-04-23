@@ -44,11 +44,6 @@ for r in [25, 50, 100]:
                         linestyle=':', linewidth=1.2, alpha=0.7, zorder=0)
     ax.add_patch(circle)
 
-
-# Draw the stimulation area
-stim_circle = plt.Circle((0, 0), stim_radius, color='black', fill=False, linestyle='--', linewidth=1.5)
-plt.gca().add_patch(stim_circle)
-
 plt.title(f"{intensity} μA in slice, I/E ratio {ratio:.2f}")
 plt.axis("off")
 plt.grid(False)
