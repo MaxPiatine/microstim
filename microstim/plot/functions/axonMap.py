@@ -4,7 +4,6 @@ import seaborn as sns
 import numpy as np
 
 from microstim.axon import axon
-from microstim.utils import intensityTreshold
 from microstim.globals import MU_E, MU_I, STDEV_E, STDEV_I, ALPHA
 
 """
