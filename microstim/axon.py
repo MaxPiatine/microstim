@@ -11,8 +11,11 @@ checkNormalized = False
 def axon(intensity_at_axon, axon_diameter=None):
     if axon_diameter:
         threshold_for_diameter = intensityTreshold(axon_diameter)
-        linspace = np.arange(RHEOBASE, threshold_for_diameter, STEP)
-        print(intensity_at_axon, threshold_for_diameter)
+        if intensity_at_axon < threshold_for_diameter:
+            return None, None, 0, 0
+
+        linspace = np.arange(RHEOBASE, intensity_at_axon, STEP)    
+            
     else:
         linspace = axon_linspace
 
