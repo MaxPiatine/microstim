@@ -1,6 +1,6 @@
 ### Parameters 
 ```math
-I_\infty = 0.1 \muA
+I_\infty = 0.1 \mu A
 
 t = 200 ms
 
