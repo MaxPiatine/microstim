@@ -86,7 +86,7 @@ STDEV_E, STDEV_I = 0.258, 0.1 #0.001, 0.001
 # https://www.eneuro.org/content/5/5/ENEURO.0297-18.2018#:~:text=The%20nodes%20of%20Ranvier%20(Rasband,n%20=%20100%20nonGABA%20nodes%20from
 # https://pmc.ncbi.nlm.nih.gov/articles/PMC10068302/#:~:text=The%20axon%20diameter%20of%20myelinated,159%2C%20P%20%3C%200.001).
 
-RHEOBASE = 0.1 #microAmp
+RHEOBASE = 5 #microAmp
 PULSE = 200 #microseconds
 STEP = 1e-6
 axon_linspace = np.arange(RHEOBASE, RHEOBASE+0.01, STEP)

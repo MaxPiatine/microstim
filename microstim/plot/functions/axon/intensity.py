@@ -20,8 +20,8 @@ for index, i in enumerate(intensity):
 
     _, ratio = axonMapping(i, axons, chunk, stim_radius, resolution)
 
-    if index > 2 and ratio == ratios[-1] and ratio == ratios[-2]:
-        stop_index = index  
+    # if index > 2 and ratio == ratios[-1] and ratio == ratios[-2] and ratio != 0:
+    #     stop_index = index  
 
     ratios.append(ratio)
 

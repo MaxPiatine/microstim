@@ -16,7 +16,7 @@ If we minimally assume that there is 1 axon to each neuron then we would have
 
 
 
-intensity = 1.5 #microAmp mm
+intensity = 10 #microAmp mm
 axons = 100 # number of axons in slice
 chunk = 200 # total area in microns (slice x slice) 
 stim_radius = 1 + ALPHA  # stimulation radius in microns
