@@ -52,10 +52,10 @@ def axon(intensity_at_axon, axon_diameter=None):
     return lognrml_e, lognrml_i, ratio_e, ratio_i
             
         
-def axonMapping(intensity, slice, axons, stim_radii, resoltuion = 0.1):
+def axonMapping(intensity, chunk, axons, stim_radii, resoltuion = 0.1):
     np.random.seed(2)
 
-    grid_size = int(slice / resoltuion)  
+    grid_size = int(chunk / resoltuion)  
     half_grid = grid_size // 2
 
     stim_radius = int(stim_radii / resoltuion)  # in pixels
