@@ -4,8 +4,8 @@ import seaborn as sns
 from microstim.axon import axon
 from microstim.globals import axon_linspace
 
-distance = 10 #microns 
-intensity_0 = 1500 #microAmps
+distance = 1000 #microns 
+intensity_0 = 103.8 #microAmps
 intensity = intensity_0/distance
 
 sns.set_theme(style="ticks")

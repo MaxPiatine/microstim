@@ -9,8 +9,7 @@ from math import sqrt
 from microstim.globals import THRESHOLD, X_RANGE, DT, TAU, SYN, RHEOBASE, PULSE
 
 # Boost and Hinder are used to manipulate the intensity pdf 
-boost = 1
-hinder = 100
+wantPlot = False
 
 """
 helpful functions
@@ -35,24 +34,37 @@ def lognormal(x, mu, sigma):
 def intensityTreshold(diameter):
     return RHEOBASE*(1+np.exp(2.212)/(PULSE*diameter**0.355))
 
-def intensityPDF(intensity, mu_d, sigma_d, isTest=False):
-    mean_T = RHEOBASE*(1+np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2/2)/PULSE)/hinder
-    sigma_T = np.sqrt((RHEOBASE/PULSE)**2 * np.exp(4.424 - 0.71*mu_d) * (np.exp((0.71*sigma_d)**2/2)-np.exp((0.355*sigma_d)**2)))
-    
-    if isTest:
-        print(f"\nDebug values:")
-        mean_exp = np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2)
-        print(f"mean exp: {mean_exp}", f"rheobase: {RHEOBASE*mean_exp}", f"mean_T: {mean_T}")
-        print(f"sigma_T: {sigma_T}")
-    log_arg = RHEOBASE*np.exp(2.212)/((intensity-RHEOBASE)*PULSE)
-    log_term = np.log(log_arg)
-    if isTest:
-        print(f"200*log_term/71: {200*log_term/71}")
-        print(f"exponent: {-(200*log_term/71 - mean_T)**2/(2*sigma_T**2)}")
-        print(f"exp(exponent): {np.exp(-(200*log_term/71 - mean_T)**2/(2*sigma_T**2))}")
-        print(f"coefficient: {(200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(intensity-RHEOBASE)}")
-    
-    return (200/(71*sigma_T*np.sqrt(2*np.pi))) * 1/(intensity-RHEOBASE) * np.exp(-(boost*200*np.log(RHEOBASE*np.exp(2.212)/((intensity-RHEOBASE)*PULSE))/71 - mean_T)**2/(2*sigma_T**2))
+def diameter(threshold):
+    return (PULSE*np.exp(-2.212)*(threshold/RHEOBASE-1))**(-200/71)
+
+def intensityPDF(threshold, mu_d, sigma_d):
+    if wantPlot:
+        diameter_samples = np.random.lognormal(mean=mu_d, sigma=sigma_d, size=100000)
+        threshold_samples = intensityTreshold(diameter_samples)
+        plt.figure(figsize=(10, 6))
+        counts, bins, _ = plt.hist(threshold_samples, bins=100, density=True,
+                                color='skyblue', alpha=0.7, label='Threshold Samples')
+        
+        # Generate x-values for the PDF curve (threshold values)
+        x = np.linspace(max(bins[0], 1e-6), bins[-1], 1000)  # Avoid log(0)
+        
+        # Compute your P(I) formula for each x
+        d = diameter(x)  
+        log_d = np.log(d)
+        
+        coefficient = 200 / (71 * sigma_d * np.sqrt(2 * np.pi) * (x - RHEOBASE))
+        y = coefficient * np.exp(-(log_d - mu_d)**2 / (2 * sigma_d**2))
+        
+        plt.plot(x, y, 'r-', linewidth=2, label='Theoretical P(I)')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.show()
+        return
+
+    d = diameter(threshold)  
+    log_d = np.log(d)
+    coefficient = 200 / (71 * sigma_d * np.sqrt(2 * np.pi) * (threshold - RHEOBASE))
+    return coefficient * np.exp(-(log_d - mu_d)**2 / (2 * sigma_d**2))
 
 def ConvertDiameterMean(mu_d, sigma_d):
     return RHEOBASE*(1+np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2/2)/PULSE)

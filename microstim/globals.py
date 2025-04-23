@@ -79,9 +79,11 @@ gamma = {
 """
 Axon Dynamics
 """
-MU_E, MU_I = 0.45, 0.54 #microns
-STDEV_E, STDEV_I = 0.001, 0.001
-RHEOBASE = 100 #microAmp
-PULSE = 10 #microseconds
-STEP = 0.01
-axon_linspace = np.arange(RHEOBASE, RHEOBASE*5, STEP)
+# diameters
+MU_E, MU_I = 0.678, 1.28 #0.45, 0.54 #microns
+STDEV_E, STDEV_I = 0.258, 0.1 #0.001, 0.001
+
+RHEOBASE = 0.1 #microAmp
+PULSE = 200 #microseconds
+STEP = 1e-6
+axon_linspace = np.arange(RHEOBASE, RHEOBASE+0.01, STEP)
