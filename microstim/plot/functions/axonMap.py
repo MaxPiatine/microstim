@@ -15,7 +15,10 @@ Inhibitory neurons make up ~15-20%
 If we minimally assume that there is 1 axon to each neuron then we would have
 1063 excitatory axons vs 188 inhibitory neurons in a slice
 """
-intensity = 1.2 #microAmp mm
+
+np.random.seed(2)
+
+intensity = 10 #microAmp mm
 
 # Parameters
 micron_range = 200       # total area in microns
@@ -40,6 +43,9 @@ occupied_mask = np.zeros_like(axon_map, dtype=bool)
 y_indices, x_indices = np.ogrid[:grid_size, :grid_size]
 center_mask = (x_indices - half_grid) ** 2 + (y_indices - half_grid) ** 2 <= stim_radius ** 2
 occupied_mask[center_mask] = True  # mark as unavailable
+
+# Store axon information for plotting
+axons_info = []  # will store (x, y, radius, ratio, axon_type)
 
 # Populate axons
 attempts = 0
@@ -66,8 +72,7 @@ while placed_axons < num_axons and attempts < max_attempts:
         radius = int(np.round(radius_microns / res)) 
 
         _, _, ratio_e, _ = axon(intensity/distance, diameter)
-
-        # temporary solution, don't think this works as well as the pdf ratio
+        ratio = ratio_e
         ratios_e += ratio_e
     else:
         axon_type = -1
@@ -75,9 +80,8 @@ while placed_axons < num_axons and attempts < max_attempts:
         radius_microns = diameter / 2
         radius = int(np.round(radius_microns / res)) 
         _, _, ratio_i, _ = axon(intensity/distance, diameter)
-
+        ratio = ratio_i
         ratios_i += ratio_i
-
 
     # Calculate bounding box
     x_min = x_center - radius - 1
@@ -94,7 +98,19 @@ while placed_axons < num_axons and attempts < max_attempts:
     subregion_mask = occupied_mask[y_min:y_max, x_min:x_max]
 
     if not np.any(subregion_mask[full_disk_mask]):
-        axon_map[y_min:y_max, x_min:x_max][ring_mask] = axon_type
+        # Store axon info for plotting
+        x_pos = (x_center - half_grid) * res
+        y_pos = (y_center - half_grid) * res
+        axons_info.append((x_pos, y_pos, radius_microns, ratio, axon_type))
+        
+        # Mark the axon in the map
+        if ratio != 0:
+            # Fill the entire disk for activated axons
+            axon_map[y_min:y_max, x_min:x_max][full_disk_mask] = axon_type
+        else:
+            # Just the ring for non-activated axons
+            axon_map[y_min:y_max, x_min:x_max][ring_mask] = axon_type
+        
         occupied_mask[y_min:y_max, x_min:x_max][full_disk_mask] = True
         placed_axons += 1
 
@@ -120,7 +136,7 @@ stim_circle = plt.Circle((0, 0), stim_radius_microns, color='black', fill=False,
 ax.add_patch(stim_circle)
 
 # Add reference circles
-for r in [10, 20, 40]:
+for r in [25, 50, 100]:
     circle = plt.Circle((0, 0), r, color='gold', fill=False,
                         linestyle=':', linewidth=1.2, alpha=0.7, zorder=0)
     ax.add_patch(circle)
@@ -130,6 +146,7 @@ for r in [10, 20, 40]:
 stim_circle = plt.Circle((0, 0), stim_radius_microns, color='black', fill=False, linestyle='--', linewidth=1.5)
 plt.gca().add_patch(stim_circle)
 
+plt.title(f"{intensity} μA in slice, I/E ratio {ratio:.2f}")
 plt.axis("off")
 plt.grid(False)
 plt.tight_layout()
