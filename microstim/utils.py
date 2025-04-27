@@ -27,6 +27,9 @@ def maxRadius(v, x_range: torch.Tensor, threshold: int):
     x_max = torch.where(torch.any(mask), x_range[max_idx], torch.tensor(0.0, device=v.device))
     
     return x_max  
+def gaussian(x, mean, std):
+    scale = 1.0 / (std * np.sqrt(2 * np.pi))
+    return scale * np.exp(-(x - mean)**2 / (2 * std**2))
 
 def lognormal(x, mu, sigma):
     return np.exp(-(np.log(x)-mu)**2/(2*sigma**2))/(x*sigma*np.sqrt(2*np.pi))
@@ -37,9 +40,12 @@ def intensityTreshold(diameter):
 def diameter(threshold):
     return (PULSE*np.exp(-2.212)*(threshold/RHEOBASE-1))**(-200/71)
 
+def diameterDerivative(threshold):
+    return (200/71) * (np.exp(2.212)/PULSE)**(200/71) * (1/RHEOBASE) * (threshold/RHEOBASE - 1)**(-271/71)
+
 def intensityPDF(threshold, mu_d, sigma_d):
     if wantPlot:
-        diameter_samples = np.random.lognormal(mean=mu_d, sigma=sigma_d, size=100000)
+        diameter_samples = np.random.normal(mu_d, sigma_d, 100000)
         threshold_samples = intensityTreshold(diameter_samples)
         plt.figure(figsize=(10, 6))
         counts, bins, _ = plt.hist(threshold_samples, bins=100, density=True,
@@ -50,10 +56,9 @@ def intensityPDF(threshold, mu_d, sigma_d):
         
         # Compute your P(I) formula for each x
         d = diameter(x)  
-        log_d = np.log(d)
         
-        coefficient = 200 / (71 * sigma_d * np.sqrt(2 * np.pi) * (x - RHEOBASE))
-        y = coefficient * np.exp(-(log_d - mu_d)**2 / (2 * sigma_d**2))
+        coefficient = 1/(sigma_d * np.sqrt(2 * np.pi)) * diameterDerivative(x)
+        y = coefficient * np.exp(-(d - mu_d)**2 / (2 * sigma_d**2))
         
         plt.plot(x, y, 'r-', linewidth=2, label='Theoretical P(I)')
         plt.legend()
@@ -62,9 +67,8 @@ def intensityPDF(threshold, mu_d, sigma_d):
         return
 
     d = diameter(threshold)  
-    log_d = np.log(d)
-    coefficient = 200 / (71 * sigma_d * np.sqrt(2 * np.pi) * (threshold - RHEOBASE))
-    return coefficient * np.exp(-(log_d - mu_d)**2 / (2 * sigma_d**2))
+    coefficient = 1 / (sigma_d * np.sqrt(2 * np.pi)) * diameterDerivative(threshold)
+    return coefficient * np.exp(-(d - mu_d)**2 / (2 * sigma_d**2))
 
 def ConvertDiameterMean(mu_d, sigma_d):
     return RHEOBASE*(1+np.exp(2.212-0.355*mu_d+(0.355*sigma_d)**2/2)/PULSE)

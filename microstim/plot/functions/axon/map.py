@@ -14,9 +14,9 @@ If we minimally assume that there is 1 axon to each neuron then we would have
 1063 excitatory axons vs 188 inhibitory neurons in a slice
 """
 
+prod=True
 
-
-intensity = 10 #microAmp mm
+intensity = 6 #microAmp mm
 axons = 100 # number of axons in slice
 chunk = 200 # total area in microns (slice x slice) 
 stim_radius = 1 + ALPHA  # stimulation radius in microns
@@ -39,7 +39,7 @@ stim_circle = plt.Circle((0, 0), stim_radius, color='black', fill=False,
 ax.add_patch(stim_circle)
 
 # Add reference circles
-for r in [25, 50, 100]:
+for r in [25, 50, 99]:
     circle = plt.Circle((0, 0), r, color='gold', fill=False,
                         linestyle=':', linewidth=1.2, alpha=0.7, zorder=0)
     ax.add_patch(circle)
@@ -48,4 +48,7 @@ plt.title(f"{intensity} μA in slice, I/E ratio {ratio:.2f}")
 plt.axis("off")
 plt.grid(False)
 plt.tight_layout()
+if prod:
+    plt.savefig("results/axon/svg/EImap.svg", format="svg", bbox_inches="tight")
+    plt.savefig("results/axon/EImap.png", format="png", bbox_inches="tight")
 plt.show()
