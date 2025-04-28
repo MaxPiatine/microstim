@@ -2,4 +2,7 @@ microfield/
 research/
 machine/
 code/
-microstim/plot/results/*
+
+results/axon/svg/
+results/Histed/svg/
+results/Stoney/svg/
