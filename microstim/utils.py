@@ -8,9 +8,6 @@ from math import sqrt
 
 from microstim.globals import THRESHOLD, X_RANGE, DT, TAU, SYN, RHEOBASE, PULSE
 
-# Boost and Hinder are used to manipulate the intensity pdf 
-wantPlot = False
-
 """
 helpful functions
 """
@@ -44,28 +41,6 @@ def diameterDerivative(threshold):
     return (200/71) * (np.exp(2.212)/PULSE)**(200/71) * (1/RHEOBASE) * (threshold/RHEOBASE - 1)**(-271/71)
 
 def intensityPDF(threshold, mu_d, sigma_d):
-    if wantPlot:
-        diameter_samples = np.random.normal(mu_d, sigma_d, 100000)
-        threshold_samples = intensityTreshold(diameter_samples)
-        plt.figure(figsize=(10, 6))
-        counts, bins, _ = plt.hist(threshold_samples, bins=100, density=True,
-                                color='skyblue', alpha=0.7, label='Threshold Samples')
-        
-        # Generate x-values for the PDF curve (threshold values)
-        x = np.linspace(max(bins[0], 1e-6), bins[-1], 1000)  # Avoid log(0)
-        
-        # Compute your P(I) formula for each x
-        d = diameter(x)  
-        
-        coefficient = 1/(sigma_d * np.sqrt(2 * np.pi)) * diameterDerivative(x)
-        y = coefficient * np.exp(-(d - mu_d)**2 / (2 * sigma_d**2))
-        
-        plt.plot(x, y, 'r-', linewidth=2, label='Theoretical P(I)')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.show()
-        return
-
     d = diameter(threshold)  
     coefficient = 1 / (sigma_d * np.sqrt(2 * np.pi)) * diameterDerivative(threshold)
     return coefficient * np.exp(-(d - mu_d)**2 / (2 * sigma_d**2))

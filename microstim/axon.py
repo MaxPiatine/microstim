@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from microstim.utils import intensityPDF, intensityTreshold
-from microstim.globals import MU_E, MU_I, STDEV_E, STDEV_I, STEP, RHEOBASE, ALPHA, axon_linspace
+from microstim.globals import MU_E, MU_I, STDEV_E, STDEV_I, STEP, RHEOBASE, axon_linspace
 
 checkNormalized = False
 

@@ -12,13 +12,14 @@ from microstim.axon import axon
 from microstim.globals import axon_linspace, RHEOBASE, STEP, current_dir
 
 files_path = current_dir + "/plot/results/"
-"""
-intensity is a function of distance. Assuming there is an initial intensity I_0 the 
-numpy arange is the intensity I_0 changing with respect to distance
-"""
+os.makedirs(files_path, exist_ok=True)
+
+# Intensity sweep range
 intensities = np.arange(8.7, 12, 0.01)
 
 ratios = []
+intensity_vals = []  # For the lower ratio plot
+
 for index, intensity in enumerate(intensities):
     integral_e, integral_i, ratio_e, ratio_i = axon(intensity)
     ratio_e = round(ratio_e, 2)
@@ -26,11 +27,13 @@ for index, intensity in enumerate(intensities):
     if ratio_e == 0:
         ratio = ratio_i
     else:
-        ratio =  ratio_i/ ratio_e
-    
+        ratio = ratio_i / ratio_e
+
     print(f"exc ratio of {intensity:.2f} μA, ratio i: {ratio_i}, ratio e: {ratio_e}, ratio {ratio}")
     ratios.append(ratio)
+    intensity_vals.append(intensity)
 
+    # Plot the top panel (spatial profiles)
     sns.set_theme(style="ticks")
     palette = sns.color_palette("mako_r", n_colors=3) 
 
@@ -38,7 +41,6 @@ for index, intensity in enumerate(intensities):
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
-    # Shade the region below RHEOBASE
     plt.axvspan(0, RHEOBASE, color='gray', alpha=0.2)
     plt.plot(axon_linspace, integral_e, color=palette[0], label="exc")
     plt.plot(axon_linspace, integral_i, color=palette[1], label="inh")
@@ -52,35 +54,55 @@ for index, intensity in enumerate(intensities):
     plt.legend()
     plt.tight_layout()
 
-    save_name = "./microstim/plot/results/"+str(index)+"plot.png"
-    
+    save_name = os.path.join(files_path, f"{index}plot.png")
     plt.savefig(save_name, transparent=True)
-    
-    #close known Matplotlib memory leak
     plt.close()
     gc.collect()
 
-
-files = sorted(glob.glob("./microstim/plot/results/*.png"), key=os.path.getmtime)
+# Gather saved images
+files = sorted(glob.glob(os.path.join(files_path, "*.png")), key=os.path.getmtime)
 images = [np.array(Image.open(file)) for file in files]
-os.makedirs("results", exist_ok=True)
 
-fig, ax = plt.subplots()
-im = ax.imshow(images[0], animated=True)
-plt.axis("off") 
+# === Create the animation with 2 plots ===
+fig = plt.figure(figsize=(6, 8))
+from matplotlib.gridspec import GridSpec
+gs = GridSpec(2, 1, height_ratios=[3, 1])
+ax1 = fig.add_subplot(gs[0])
+ax2 = fig.add_subplot(gs[1])
+
+im = ax1.imshow(images[0], animated=True)
+ax1.axis("off")
+
+# Lower plot setup
+line, = ax2.plot([], [], color="purple", label="I/E ratio")
+ax2.set_xlim([8.7, 12])
+ax2.set_ylim([0, max(ratios) + 1])
+ax2.set_xlabel("Intensity [μA]")
+ax2.set_ylabel("I/E Ratio")
+ax2.grid(True)
+ax2.legend()
+
+# Animation data holders
+growing_x, growing_y = [], []
 
 def update(i):
     im.set_array(images[i])
-    return [im]
+    growing_x.append(intensity_vals[i])
+    growing_y.append(ratios[i])
+    line.set_data(growing_x, growing_y)
+    ax2.relim()
+    ax2.autoscale_view(scalex=False, scaley=True)
+    return [im, line]
 
-# Create the animation
 animated = animation.FuncAnimation(
     fig, update, frames=len(images), interval=150, blit=True, repeat_delay=10
 )
 
-# Save the animation as a GIF
+# Save GIF
+os.makedirs("./results/axon", exist_ok=True)
 animated.save("./results/axon/axon_intensity.gif", writer="pillow", fps=30)
-    
-list(map(os.remove, glob.glob(os.path.join(files_path, "*.png"))))
+
+# Clean up PNGs
+list(map(os.remove, files))
 os.system('say "Axon Dynamics GIF"')
 plt.show()
