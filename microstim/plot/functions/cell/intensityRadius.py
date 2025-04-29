@@ -1,7 +1,7 @@
 import numpy as np
 import argparse
 
-from microstim.globals import intensity, depol_weights, depol_sigma, act_weights, act_sigma, gamma, start_boost, no_boost, no_boost_weights, X_RANGE
+from microstim.globals import intensity, depol_weights, depol_sigma, act_weights, act_sigma, gamma, start_boost, no_boost, no_boost_weights
 from microstim.main import model
 from microstim.utils import rect
 
@@ -37,4 +37,4 @@ for intensity in intensities:
     max_no_rho.append(max(no_rho))
 
 
-np.savez(f"results/{typeModel}/intensityRadius.npz", x=X_RANGE, y1=max_rho_e, y2=max_rho_i, y3=max_no_rho)
+np.savez(f"results/{typeModel}/intensityRadius.npz", x=intensities, y1=max_rho_e, y2=max_rho_i, y3=max_no_rho)
