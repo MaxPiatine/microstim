@@ -3,7 +3,5 @@
 python3 -m microstim.plot.{foo.py}
 ```
 
-## Assets
-![alt text](assets/graphs.png)
-
-![alt text](assets/desc.png)
+## Server Branch
+This branch is whenever a server does not contain matplotlib packages. This will be used to funnel data between local and remote machines. DO NOT MERGE THIS BRANCH WITH MAIN.

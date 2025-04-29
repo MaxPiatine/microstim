@@ -1,15 +1,9 @@
-import gc
 import torch
 import numpy as np
-import seaborn as sns
-import matplotlib.pylab as plt
 from scipy.special import erf
 from math import sqrt
 
 from microstim.globals import THRESHOLD, X_RANGE, DT, TAU, SYN, RHEOBASE, PULSE
-
-# Boost and Hinder are used to manipulate the intensity pdf 
-wantPlot = False
 
 """
 helpful functions
@@ -27,6 +21,7 @@ def maxRadius(v, x_range: torch.Tensor, threshold: int):
     x_max = torch.where(torch.any(mask), x_range[max_idx], torch.tensor(0.0, device=v.device))
     
     return x_max  
+
 def gaussian(x, mean, std):
     scale = 1.0 / (std * np.sqrt(2 * np.pi))
     return scale * np.exp(-(x - mean)**2 / (2 * std**2))
@@ -44,28 +39,6 @@ def diameterDerivative(threshold):
     return (200/71) * (np.exp(2.212)/PULSE)**(200/71) * (1/RHEOBASE) * (threshold/RHEOBASE - 1)**(-271/71)
 
 def intensityPDF(threshold, mu_d, sigma_d):
-    if wantPlot:
-        diameter_samples = np.random.normal(mu_d, sigma_d, 100000)
-        threshold_samples = intensityTreshold(diameter_samples)
-        plt.figure(figsize=(10, 6))
-        counts, bins, _ = plt.hist(threshold_samples, bins=100, density=True,
-                                color='skyblue', alpha=0.7, label='Threshold Samples')
-        
-        # Generate x-values for the PDF curve (threshold values)
-        x = np.linspace(max(bins[0], 1e-6), bins[-1], 1000)  # Avoid log(0)
-        
-        # Compute your P(I) formula for each x
-        d = diameter(x)  
-        
-        coefficient = 1/(sigma_d * np.sqrt(2 * np.pi)) * diameterDerivative(x)
-        y = coefficient * np.exp(-(d - mu_d)**2 / (2 * sigma_d**2))
-        
-        plt.plot(x, y, 'r-', linewidth=2, label='Theoretical P(I)')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.show()
-        return
-
     d = diameter(threshold)  
     coefficient = 1 / (sigma_d * np.sqrt(2 * np.pi)) * diameterDerivative(threshold)
     return coefficient * np.exp(-(d - mu_d)**2 / (2 * sigma_d**2))
@@ -103,37 +76,6 @@ def sigmoidalRect(v):
         except IndexError:
             continue
     return f
-
-"""
-animation plot
-"""
-def plot_tn(responses, n):
-    sns.set_theme(style="ticks")
-    palette = sns.color_palette("rocket_r", n_colors=3) 
-
-    f = plt.figure()
-    ax = plt.subplot(111)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-
-    plt.title("time step "+str(n))
-    plt.xlabel("Distance (μm)")
-    plt.ylabel("Relative Voltage mV")
-
-    ax.hlines(20, 0 , max(X_RANGE), color="k", linestyles='-.')
-    plt.plot(X_RANGE, responses[0], color=palette[1], label=r"$V_e$")
-    plt.plot(X_RANGE, responses[1], color=palette[2], label=r"$V_i$")
-
-    f.tight_layout()
-    
-    save_name = "./microstim/plot/results/"+str(n)+"plot.png"
-    
-    plt.savefig(save_name, transparent=True)
-    
-    #close known Matplotlib memory leak
-    plt.close()
-    gc.collect()
-
 
 """
 Runge-Kutta

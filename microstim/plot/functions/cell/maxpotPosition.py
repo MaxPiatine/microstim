@@ -1,35 +1,32 @@
-import os
-import matplotlib.pylab as plt
-import seaborn as sns
+import argparse
 import numpy as np
 
-from microstim.globals import T_RANGE, intensity, sigma, weights, start_boost, gamma, no_boost, no_boost_weights
+from microstim.globals import intensity, depol_weights, depol_sigma, act_weights, act_sigma, gamma, start_boost, no_boost, no_boost_weights, X_RANGE, DX
 from microstim.main import model
-from microstim.utils import rect, sigmoid
+from microstim.utils import rect
 
-boost = gamma.copy()
-v_e, v_i, _, _, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=False)
-no_amp, _, _, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=False)
+parser = argparse.ArgumentParser(description="the maximum potential function attained at a distance away from stim site")
+parser.add_argument("--is_depol", action="store_true", help="Run model with depolarization")
+parser.add_argument("--position", type=int, default=250, help="Position index (default: 250 microns)")
 
-sns.set_theme(style="ticks")
-palette = sns.color_palette("rocket_r", n_colors=3)  # Reverse 'rocket' palette
+args = parser.parse_args()
 
-ax = plt.subplot(111) 
-ax.spines['top'].set_visible(False)
-ax.spines['right'].set_visible(False)
+is_depolarized = args.is_depol
+position = args.position/DX
+typeModel = ""
 
-# Use the Seaborn palette colors
-plt.plot(T_RANGE, np.clip(v_e[:, 250], -100, 20), color=palette[1], label=r"amp $v_e$")
-plt.plot(T_RANGE, np.clip(v_i[:, 250], -100, 20), color=palette[2], label=r"amp $v_i$")
-plt.plot(T_RANGE, np.clip(no_amp[:, 250], -100, 20), color=palette[0], label="no amp")
+if is_depolarized:
+    boost = start_boost.copy()
+    weights = depol_weights.copy()
+    sigma = depol_sigma.copy()
+    typeModel += "Stoney"
+else:
+    boost = gamma.copy()
+    weights = act_weights.copy()
+    sigma = act_sigma.copy()
+    typeModel += "Histed"
 
-# Add labels, limits, and legend
-plt.xlabel("Normalized Time")
-plt.ylabel("mV")
-plt.ylim([-20,20])
-plt.legend(loc="best")
-plt.savefig("results/amp1/svg/maxpotX=250microns.svg", format="svg", bbox_inches="tight")
-plt.savefig("results/amp1/maxpotX=250microns.png", format="png", bbox_inches="tight")
-os.system('say "maximum potential finished"')
+v_e, v_i, _, _, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized)
+no_amp, _, _, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=is_depolarized)
 
-plt.show()
+np.savez(f"results/{typeModel}/maxpotX={args.position}microns.npz", x=X_RANGE, y1=np.clip(v_e[:, position], -100, 20), y2=np.clip(v_i[:, position], -100, 20), y3=np.clip(no_amp[:, position], -100, 20))

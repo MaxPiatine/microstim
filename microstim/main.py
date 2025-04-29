@@ -4,10 +4,9 @@ import numpy as np
 import time
 
 from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, R, P, DT, TAU, SYN, THRESHOLD
-from microstim.utils import maxRadius, normal, plot_tn, k_e, k_i, spectral_convolution, KernelConvolution
+from microstim.utils import maxRadius, normal
 
 usingFFT = False
-gif = False
 
 def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_only=False):
     start = time.time()
@@ -73,8 +72,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
         """
         activation model
         """
-        nu_e[0] = torch.log(intensity) * boost["exc"] * normal(X_RANGE_tensor, sigma["ee"])
-        nu_i[0] = torch.log(intensity) * boost["inh"] * normal(X_RANGE_tensor, sigma["ii"])
+        nu_e[0] = np.log(intensity) * boost["exc"] * normal(X_RANGE_tensor, sigma["ee"])
+        nu_i[0] = np.log(intensity) * boost["inh"] * normal(X_RANGE_tensor, sigma["ii"])
 
     for i in range(0, len(i_RANGE)-1):
         if i % 100 == 0:
@@ -115,9 +114,6 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
             rho_e[i+1] = maxRadius(v_e[i+1], X_RANGE_tensor, THRESHOLD)
             rho_i[i+1] = maxRadius(v_i[i+1], X_RANGE_tensor, THRESHOLD)
             # print(f"MaxRadius time: {time.time() - radius_start} seconds")
-        
-        if gif:
-            plot_tn([v_e[i].cpu().numpy(), v_i[i].cpu().numpy()], i)
         
 
     end = time.time()
