@@ -29,13 +29,3 @@ k = \begin{cases}
 \Delta T = 0.01 ms\\
 
 ```
-
-![](depolarizationAnimation.gif)
-![](activationAnimation.gif)
-![alt text](radii.png)
-![alt text](maxpotDistance.png)
-![alt text](maxpotX=100microns.png)
-![alt text](intensityRadius.png)
-![alt text](intensityPotential.png)
-![alt text](dmKHeatmap.png)
-![alt text](amAlphaHeatmap.png)
