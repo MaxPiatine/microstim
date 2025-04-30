@@ -22,13 +22,6 @@ k = \begin{cases}
 
 \Theta = \Pi \\
 
-\Delta T = 0.01 ms\\
+\Delta T = 0.001 ms\\
 
 ```
-![](animation.gif)
-![alt text](radii.png)
-![alt text](maxpotDistance.png)
-![alt text](maxpotX=250microns.png)
-![alt text](intensityRadius.png)
-![alt text](intensityPotentialX=250microns.png)
-![alt text](EIheatmap.png)

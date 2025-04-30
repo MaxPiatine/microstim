@@ -19,7 +19,7 @@ else:
     typeModel += "Histed"
 
 pos = 250 #microns
-path = f"results/{typeModel}/intensityPotentialX={pos}microns.npz"
+path = f"results/{typeModel}/radii.npz"
 data = np.load(path)
 
 t_range = data["x"]
