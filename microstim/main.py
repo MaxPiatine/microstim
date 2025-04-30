@@ -73,8 +73,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
         """
         activation model
         """
-        nu_e[0] = torch.log(intensity) * boost["exc"] * normal(X_RANGE_tensor, sigma["ee"])
-        nu_i[0] = torch.log(intensity) * boost["inh"] * normal(X_RANGE_tensor, sigma["ii"])
+        nu_e[0] = np.log(intensity) * boost["exc"] * normal(X_RANGE_tensor, sigma["ee"])
+        nu_i[0] = np.log(intensity) * boost["inh"] * normal(X_RANGE_tensor, sigma["ii"])
 
     for i in range(0, len(i_RANGE)-1):
         if i % 100 == 0:
