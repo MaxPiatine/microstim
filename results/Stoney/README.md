@@ -24,4 +24,6 @@ k = \begin{cases}
 
 \Delta T = 0.001 ms\\
 
+\tau_s = 5 ms
+
 ```
