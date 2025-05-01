@@ -30,8 +30,8 @@ max_no_rho = []
 intensities = np.arange(0, 300, 25)
 for intensity in intensities:
     print("intensity %f" % intensity)
-    _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized)
-    _, _, no_rho, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=is_depolarized)
+    _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized, radius_only=True)
+    _, _, no_rho, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=is_depolarized, radius_only=True)
     max_rho_e.append(max(rho_e))
     max_rho_i.append(max(rho_i))
     max_no_rho.append(max(no_rho))

@@ -32,7 +32,7 @@ for x, inh_boost in enumerate(ranges):
     for y, exc_boost in enumerate(ranges):
         boost["exc"] = exc_boost
         
-        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized)
+        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized, radius_only=True)
         heatmap[x][y] += max(rho_e)
 
         print(boost)

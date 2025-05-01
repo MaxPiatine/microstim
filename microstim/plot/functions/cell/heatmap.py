@@ -33,7 +33,7 @@ for y, W_ei in enumerate(Wei_RANGE):
     for x, direct_inh in enumerate(inh_RANGE):
         print(y, ": ", x)
         boost["inh"] = direct_inh
-        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized)
+        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized, radius_only=True)
         heatmap[x][y] += max(rho_i)
 
 np.save(f"results/{typeModel}/heatmap.npy", heatmap)

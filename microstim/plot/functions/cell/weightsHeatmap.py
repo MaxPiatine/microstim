@@ -33,7 +33,7 @@ for y, ei in enumerate(w_ranges):
     for x, ie in enumerate(w_ranges):
         weights["ie"] = ie
         print(weights)
-        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, start_boost, is_depolarized=is_depolarized)
+        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, start_boost, is_depolarized=is_depolarized, radius_only=True)
 
         heatmap[x][y] += max(rho_e)
 
