@@ -12,7 +12,7 @@ parser.add_argument("--position", type=int, default=250, help="Position index (d
 args = parser.parse_args()
 
 is_depolarized = args.is_depol
-position = args.position/DX
+position = int(args.position/DX)
 typeModel = ""
 
 if is_depolarized:
@@ -28,5 +28,4 @@ else:
 
 v_e, v_i, _, _, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized)
 no_amp, _, _, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=is_depolarized)
-
-np.savez(f"results/{typeModel}/maxpotX={args.position}microns.npz", x=X_RANGE, y1=np.clip(v_e[:, position], -100, 20), y2=np.clip(v_i[:, position], -100, 20), y3=np.clip(no_amp[:, position], -100, 20))
+np.savez(f"results/{typeModel}/maxpotX={int(args.position)}microns.npz", x=X_RANGE, y1=np.clip(v_e[:, position], -100, 20), y2=np.clip(v_i[:, position], -100, 20), y3=np.clip(no_amp[:, position], -100, 20))

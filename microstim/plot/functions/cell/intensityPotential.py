@@ -12,7 +12,7 @@ parser.add_argument("--position", type=int, default=250, help="Position index (d
 args = parser.parse_args()
 
 is_depolarized = args.is_depol
-position = args.position/DX
+position = int(args.position/DX)
 typeModel = ""
 
 if is_depolarized:
@@ -37,4 +37,4 @@ for intensity in intensities:
     max_pot.append(max(np.clip(v_e[:, position], -100, 20)))
     no_pot.append(max(np.clip(no_amp[:, position], -100, 20)))
 
-np.savez(f"results/{typeModel}/intensityPotentialX={args.position}microns.npz", x=intensity, y1=max_pot, y2=no_pot)
+np.savez(f"results/{typeModel}/intensityPotentialX={int(args.position)}microns.npz", x=intensity, y1=max_pot, y2=no_pot)

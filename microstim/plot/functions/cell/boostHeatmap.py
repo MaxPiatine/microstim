@@ -24,7 +24,7 @@ else:
     sigma = act_sigma.copy()
     typeModel += "Histed"
 
-ranges = np.arange(0, 500, 25)
+ranges = np.linspace(0, 500, 10) # 10 steps
 heatmap = np.zeros((len(ranges), len(ranges)))
 
 for x, inh_boost in enumerate(ranges):
