@@ -28,8 +28,8 @@ else:
     sigma = act_sigma.copy()
     typeModel += "Histed"
 
-Wei_RANGE = np.arange(100, 300, 25)
-inh_RANGE = np.arange(0, 400, 40)
+Wei_RANGE = np.linspace(100, 300, 10)
+inh_RANGE = np.linspace(0, 400, 10)
 heatmap = np.zeros((len(Wei_RANGE), len(inh_RANGE)))
 
 for y, W_ei in enumerate(Wei_RANGE):
@@ -37,7 +37,7 @@ for y, W_ei in enumerate(Wei_RANGE):
     for x, direct_inh in enumerate(inh_RANGE):
         print(y, ": ", x)
         boost["inh"] = direct_inh
-        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized)
+        _, _, rho_e, rho_i, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized, radius_only=True)
         heatmap[x][y] += max(rho_i)
 
 
