@@ -1,7 +1,7 @@
 import argparse
 import numpy as np
 
-from microstim.globals import intensity, depol_weights, depol_sigma, act_weights, act_sigma, gamma, start_boost, no_boost, no_boost_weights, X_RANGE, DX
+from microstim.globals import intensity, depol_weights, depol_sigma, act_weights, act_sigma, gamma, start_boost, no_boost, no_boost_weights, T_RANGE, DX
 from microstim.main import model
 from microstim.utils import rect
 
@@ -28,4 +28,4 @@ else:
 
 v_e, v_i, _, _, _, _ = model(intensity, weights, sigma, rect, boost, is_depolarized=is_depolarized)
 no_amp, _, _, _, _, _ = model(intensity, no_boost_weights, sigma, rect, no_boost, is_depolarized=is_depolarized)
-np.savez(f"results/{typeModel}/maxpotX={int(args.position)}microns.npz", x=X_RANGE, y1=np.clip(v_e[:, position], -100, 20), y2=np.clip(v_i[:, position], -100, 20), y3=np.clip(no_amp[:, position], -100, 20))
+np.savez(f"results/{typeModel}/maxpotX={int(args.position)}microns.npz", x=T_RANGE, y1=np.clip(v_e[:, position], -100, 20), y2=np.clip(v_i[:, position], -100, 20), y3=np.clip(no_amp[:, position], -100, 20))
