@@ -37,7 +37,7 @@ ax = plt.subplot(111)
 ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 
-plt.plot(T_RANGE, no_amp, color=palette[0], label="No Amp")
+# plt.plot(T_RANGE, no_amp, color=palette[0], label="No Amp")
 plt.plot(T_RANGE, rho_e, color=palette[1], label=r"$\rho_e$")
 plt.plot(T_RANGE, rho_i, color=palette[2], label=r"$\rho_i$")
 

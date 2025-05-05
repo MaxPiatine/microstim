@@ -3,14 +3,14 @@ import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-N = 12000
+N = 1200
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
 BETA = 1 
 TAU = 10 #ms
-SYN = 5
-DT = 0.001
+SYN = 1
+DT = 0.01
 D = 0.3 #nanometer
 
 THRESHOLD = 20 #mV

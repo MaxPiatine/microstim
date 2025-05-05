@@ -69,16 +69,17 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
         if radius_only:
             rho_e[0] = maxRadius(v_e[0], X_RANGE_tensor, THRESHOLD)
             rho_i[0] = maxRadius(v_i[0], X_RANGE_tensor, THRESHOLD)
-    else:
-        """
-        activation model
-        """
-        nu_e[0] = np.log(intensity) * boost["exc"] * normal(X_RANGE_tensor, sigma["ee"])
-        nu_i[0] = np.log(intensity) * boost["inh"] * normal(X_RANGE_tensor, sigma["ii"])
 
     for i in range(0, len(i_RANGE)-1):
         if i % 100 == 0:
             print("i: ", i, ", time: ", time.time() - start)
+
+        if not is_depolarized and i*DT < 2:
+            continue
+        elif not is_depolarized and i*DT==2:
+            print(i, "2ms")
+            nu_e[i] = np.log(intensity) * boost["exc"] * normal(X_RANGE_tensor, sigma["ee"])
+            nu_i[i] = np.log(intensity) * boost["inh"] * normal(X_RANGE_tensor, sigma["ii"])
 
         if usingFFT:
             nu_e_fft = torch.fft.fft(nu_e[i])
