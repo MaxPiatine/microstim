@@ -11,8 +11,7 @@ usingFFT = False
 def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_only=False):
     start = time.time()
 
-    # Set device to MPS (Metal Performance Shaders) for Apple Silicon
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     # Convert arrays to PyTorch tensors
     X_RANGE_tensor = torch.tensor(X_RANGE, dtype=torch.float32, device=device)

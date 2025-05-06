@@ -3,14 +3,14 @@ import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-N = 1200
+N = 12000
 
 R = 7 #resistance (change) KOhms
 ALPHA = 4 #micron
 BETA = 1 
 TAU = 10 #ms
-SYN = 1 # works better with Histed
-DT = 0.01
+SYN = 2 # works better with Histed
+DT = 0.001
 DX = 0.1
 D = 0.3 #nanometer
 
@@ -35,10 +35,10 @@ act_sigma = {
     } # activation model
 
 act_weights = {
-        "ee": 400,
-        "ie": 300,
-        "ei": 400,
-        "ii": 25,
+        "ee": 600,
+        "ie": 400,
+        "ei": 600,
+        "ii": 150,
     } # activation model
 
 depol_sigma = {
@@ -73,8 +73,8 @@ start_boost = {
 }
 
 gamma = {
-    "exc": 150,
-    "inh": 20,
+    "exc": 900,
+    "inh": 0,
 }
 
 """
