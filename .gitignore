@@ -6,3 +6,6 @@ code/
 results/axon/svg/
 results/Histed/svg/
 results/Stoney/svg/
+
+*npy*
+*npz*
