@@ -33,8 +33,9 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 plt.xlabel("intensity")
 plt.ylabel("mV")
-plt.plot(intensity, no_pot, color=palette[0], label="no amp")
-plt.plot(intensity, max_pot, color=palette[1], label="exc amp")
+intensities = np.arange(0.25, 300, 25)
+plt.plot(intensities, no_pot, color=palette[0], label="no amp")
+plt.plot(intensities, max_pot, color=palette[1], label="exc amp")
 plt.legend(loc="best")  
 
 if is_production:

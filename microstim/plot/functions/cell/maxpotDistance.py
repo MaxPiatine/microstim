@@ -18,11 +18,11 @@ if is_depolarized:
 else:
     typeModel += "Histed"
 
-path = f"results/{typeModel}/potHeat.npz"
+path = f"results/{typeModel}/maxpotDistance.npz"
 data = np.load(path)
 
 x_range = data["x"]
-v_e = data["y1"]
+v_e = data["y"]
 v_i = data["y2"]
 no_amp = data["y3"]
 

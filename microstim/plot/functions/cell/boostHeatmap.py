@@ -21,10 +21,14 @@ else:
 path = f"results/{typeModel}/boost_heatmap.npy"
 heatmap = np.load(path)
 
-ranges = np.arange(0, 500, 25)
+if is_depolarized:
+    ranges = np.linspace(0, 1, 10)
+else:
+    ranges = np.linspace(0, 500, 10)
+
 plt.figure(figsize=(8, 6))
 ax = sns.heatmap(
-    heatmap,
+    heatmap.T,
     xticklabels=np.round(ranges, 2),  
     yticklabels=np.round(ranges, 2),  
     linewidths=0.5, 
@@ -32,8 +36,12 @@ ax = sns.heatmap(
 
 ax.invert_yaxis()
 
-ax.set_xlabel(r"$\alpha_e$")
-ax.set_ylabel(r"$\alpha_i$")
+if is_depolarized:
+    ax.set_xlabel(r"$k_e$")
+    ax.set_ylabel(r"$k_i$")
+else:
+    ax.set_xlabel(r"$\alpha_i$")
+    ax.set_ylabel(r"$\alpha_e$")
 
 if is_production:
     plt.savefig(f"results/{typeModel}/svg/heatmap.svg", format="svg", bbox_inches="tight")

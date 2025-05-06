@@ -21,11 +21,11 @@ else:
 path = f"results/{typeModel}/boost_heatmap.npy"
 heatmap = np.load(path)
 
-w_ranges = np.arange(0, 500, 25)
+w_ranges = np.linspace(0, 500, 10)
 
 plt.figure(figsize=(8, 6))
 ax = sns.heatmap(
-    heatmap,
+    heatmap.T,
     xticklabels=np.round(w_ranges, 2),  
     yticklabels=np.round(w_ranges, 2),  
     linewidths=0.5, 

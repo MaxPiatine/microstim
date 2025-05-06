@@ -3,6 +3,8 @@ import seaborn as sns
 import argparse
 import numpy as np
 
+from microstim.globals import T_RANGE
+
 parser = argparse.ArgumentParser(description="heatmap of excitatory and inhibitory start boosts")
 parser.add_argument("--is_depol", action="store_true", help="Run model with depolarization")
 parser.add_argument("--is_prod", action="store_true", help="Run for production")
@@ -19,10 +21,9 @@ else:
     typeModel += "Histed"
 
 pos = 250 #microns
-path = f"results/{typeModel}/intensityPotentialX={pos}microns.npz"
+path = f"results/{typeModel}/maxpotX={pos}microns.npz"
 data = np.load(path)
 
-t_range = data["x"]
 v_e = data["y1"]
 v_i = data["y2"]
 no_amp = data["y3"]
@@ -35,9 +36,9 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 
 # Use the Seaborn palette colors
-plt.plot(t_range, np.clip(v_e[:, pos], -100, 20), color=palette[1], label=r"amp $v_e$")
-plt.plot(t_range, np.clip(v_i[:, pos], -100, 20), color=palette[2], label=r"amp $v_i$")
-plt.plot(t_range, np.clip(no_amp[:, pos], -100, 20), color=palette[0], label="no amp")
+plt.plot(T_RANGE, v_e, color=palette[1], label=r"amp $v_e$")
+plt.plot(T_RANGE, v_i, color=palette[2], label=r"amp $v_i$")
+plt.plot(T_RANGE, no_amp, color=palette[0], label="no amp")
 
 # Add labels, limits, and legend
 plt.xlabel("Normalized Time")

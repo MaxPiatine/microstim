@@ -21,16 +21,15 @@ else:
 path = f"results/{typeModel}/heatmap.npy"
 heatmap = np.load(path)
 
-Wei_RANGE = np.arange(100, 300, 25)
-inh_RANGE = np.arange(0, 400, 40)
+Wei_RANGE = np.linspace(100, 300, 10)
+inh_RANGE = np.linspace(0, 1.25, 10)
 
 # Create the heatmap using seaborn
 plt.figure(figsize=(8, 6))
 ax = sns.heatmap(
-    heatmap,
-    annot=True,
-    xticklabels=np.round(Wei_RANGE, 2),  
-    yticklabels=np.round(inh_RANGE, 2),  
+    heatmap.T,
+    yticklabels=np.round(Wei_RANGE, 2),  
+    xticklabels=np.round(inh_RANGE, 2),  
     linewidths=0.5, 
 )
 
