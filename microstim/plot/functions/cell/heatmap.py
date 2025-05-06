@@ -15,14 +15,15 @@ typeModel = ""
 
 if is_depolarized:
     typeModel += "Stoney"
+    Wei_RANGE = np.linspace(100, 300, 10)
+    inh_RANGE = np.linspace(0, 1.25, 10)
 else:
+    Wei_RANGE = np.linspace(0, 1000, 10)
+    inh_RANGE = np.linspace(0, 500, 10)
     typeModel += "Histed"
 
 path = f"results/{typeModel}/heatmap.npy"
 heatmap = np.load(path)
-
-Wei_RANGE = np.linspace(100, 300, 10)
-inh_RANGE = np.linspace(0, 1.25, 10)
 
 # Create the heatmap using seaborn
 plt.figure(figsize=(8, 6))

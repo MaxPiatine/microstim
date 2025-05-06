@@ -15,16 +15,13 @@ typeModel = ""
 
 if is_depolarized:
     typeModel += "Stoney"
+    ranges = np.linspace(0, 1, 10)
 else:
     typeModel += "Histed"
+    ranges = np.linspace(0, 1000, 10)
 
 path = f"results/{typeModel}/boost_heatmap.npy"
 heatmap = np.load(path)
-
-if is_depolarized:
-    ranges = np.linspace(0, 1, 10)
-else:
-    ranges = np.linspace(0, 500, 10)
 
 plt.figure(figsize=(8, 6))
 ax = sns.heatmap(
