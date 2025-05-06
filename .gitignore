@@ -10,4 +10,5 @@ results/Stoney/svg/
 microstim/plot/results/*.png
 
 *npz*
+*npy*
 *svg*
