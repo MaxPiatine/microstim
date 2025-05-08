@@ -15,10 +15,10 @@ typeModel = ""
 
 if is_depolarized:
     typeModel += "Stoney"
-    ranges = np.linspace(0, 1, 10)
+    ranges = np.linspace(0, 1, 20)
 else:
     typeModel += "Histed"
-    ranges = np.linspace(0, 1000, 10)
+    ranges = np.linspace(0, 1000, 20)
 
 path = f"results/{typeModel}/boost_heatmap.npy"
 heatmap = np.load(path)
