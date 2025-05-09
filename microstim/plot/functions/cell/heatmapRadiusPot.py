@@ -1,6 +1,6 @@
 import matplotlib.pylab as plt
 import argparse
-import seaborn as sns
+from matplotlib import cm
 import numpy as np
 
 parser = argparse.ArgumentParser(description="heatmap of excitatory and inhibitory start boosts")
@@ -26,9 +26,8 @@ x_range = data["y"]
 v_e = data["z"]
 
 fig, ax = plt.subplots()
-cmap = sns.color_palette("icefire", as_cmap=True)
 cs = ax.contourf(t_range, x_range, v_e.T, 
-                cmap=cmap,
+                cmap=cm.PuBu_r,
                 extend='both',
                 alpha=0.7)
 

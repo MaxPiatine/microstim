@@ -1,6 +1,6 @@
 import matplotlib.pylab as plt
+from matplotlib import cm
 import numpy as np
-import seaborn as sns
 import argparse
 
 parser = argparse.ArgumentParser(description="heatmap of excitatory and inhibitory start boosts")
@@ -15,29 +15,21 @@ typeModel = ""
 
 if is_depolarized:
     typeModel += "Stoney"
-    Wei_RANGE = np.linspace(100, 300, 10)
-    inh_RANGE = np.linspace(0, 1.25, 10)
+    Wei_RANGE = np.linspace(100, 300, 20)
+    inh_RANGE = np.linspace(0, 1.25, 20)
 else:
-    Wei_RANGE = np.linspace(0, 1000, 10)
-    inh_RANGE = np.linspace(0, 500, 10)
+    Wei_RANGE = np.linspace(0, 1000, 20)
+    inh_RANGE = np.linspace(0, 1000, 20)
     typeModel += "Histed"
 
 path = f"results/{typeModel}/heatmap.npy"
 heatmap = np.load(path)
 
-# Create the heatmap using seaborn
-plt.figure(figsize=(8, 6))
-ax = sns.heatmap(
-    heatmap.T,
-    yticklabels=np.round(Wei_RANGE, 2),  
-    xticklabels=np.round(inh_RANGE, 2),  
-    linewidths=0.5, 
-)
-
-ax.invert_yaxis()
-
-ax.set_xlabel("inh boost")
-ax.set_ylabel(r"$w_{ei}$")
+fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
+fig.clf()
+ax = plt.axes([0.15, 0.18, 0.8, 0.8])
+cs = ax.contourf(inh_RANGE, Wei_RANGE, heatmap.T, cmap=cm.PuBu_r, vmin=0, vmax=1000, levels=20)
+fig.colorbar(cs)
 
 if is_production:
     plt.savefig(f"results/{typeModel}/svg/heatmap.svg", format="svg", bbox_inches="tight")

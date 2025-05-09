@@ -26,6 +26,7 @@ v_e = data["y"]
 v_i = data["y2"]
 no_amp = data["y3"]
 
+fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
 sns.set_theme(style="ticks")
 palette = sns.color_palette("rocket_r", n_colors=3)  # Reverse 'rocket' palette
 
@@ -41,7 +42,6 @@ plt.plot(x_range, np.clip(np.max(no_amp, axis=0), 0, 20), color=palette[0], labe
 # Add labels, limits, and legend
 plt.xlabel("distance")
 plt.ylabel("mV")
-plt.legend(loc="best")
 
 if is_production:
     plt.savefig(f"results/{typeModel}/svg/maxpotDistance.svg", format="svg", bbox_inches="tight")

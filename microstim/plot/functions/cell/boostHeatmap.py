@@ -1,7 +1,7 @@
 import argparse
 import matplotlib.pylab as plt
 import numpy as np
-import seaborn as sns
+from matplotlib import cm
 
 parser = argparse.ArgumentParser(description="heatmap of excitatory and inhibitory start boosts")
 parser.add_argument("--is_depol", action="store_true", help="Run model with depolarization")
@@ -23,15 +23,11 @@ else:
 path = f"results/{typeModel}/boost_heatmap.npy"
 heatmap = np.load(path)
 
-plt.figure(figsize=(8, 6))
-ax = sns.heatmap(
-    heatmap.T,
-    xticklabels=np.round(ranges, 2),  
-    yticklabels=np.round(ranges, 2),  
-    linewidths=0.5, 
-)
-
-ax.invert_yaxis()
+fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
+fig.clf()
+ax = plt.axes([0.15, 0.18, 0.8, 0.8])
+cs = ax.contourf(ranges, ranges, heatmap.T, cmap=cm.PuBu_r, vmin=0, vmax=1000, levels=20)
+fig.colorbar(cs)
 
 if is_depolarized:
     ax.set_xlabel(r"$k_e$")
@@ -41,7 +37,7 @@ else:
     ax.set_ylabel(r"$\alpha_e$")
 
 if is_production:
-    plt.savefig(f"results/{typeModel}/svg/heatmap.svg", format="svg", bbox_inches="tight")
-    plt.savefig(f"results/{typeModel}/heatmap.png", format="png", bbox_inches="tight")
+    plt.savefig(f"results/{typeModel}/svg/boost_heatmap.svg", format="svg", bbox_inches="tight")
+    plt.savefig(f"results/{typeModel}/boost_heatmap.png", format="png", bbox_inches="tight")
 
 plt.show()

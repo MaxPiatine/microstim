@@ -18,10 +18,10 @@ if is_depolarized:
 else:
     typeModel += "Histed"
 
-path = f"results/{typeModel}/boost_heatmap.npy"
+path = f"results/{typeModel}/weights_heatmap.npy"
 heatmap = np.load(path)
 
-w_ranges = np.linspace(0, 500, 10)
+w_ranges = np.linspace(100, 1000, 20)
 
 plt.figure(figsize=(8, 6))
 ax = sns.heatmap(

@@ -27,6 +27,7 @@ rho_e = data["y1"]
 rho_i = data["y2"]
 no_amp = data["y3"]
 
+fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
 sns.set_theme(style="ticks")
 palette = sns.color_palette("rocket_r", n_colors=3) 
 
@@ -40,7 +41,6 @@ plt.plot(t_range, rho_i, color=palette[2], label=r"$\rho_i$")
 
 plt.xlabel("time [ms]")
 plt.ylabel(r"Radius [$\mu$m]")
-plt.legend(loc="best")
 
 if is_production:
     plt.savefig(f"results/{typeModel}/svg/radii.svg", format="svg", bbox_inches="tight")

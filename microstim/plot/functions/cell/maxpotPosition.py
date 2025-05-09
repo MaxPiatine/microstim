@@ -28,6 +28,7 @@ v_e = data["y1"]
 v_i = data["y2"]
 no_amp = data["y3"]
 
+fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
 sns.set_theme(style="ticks")
 palette = sns.color_palette("rocket_r", n_colors=3)  # Reverse 'rocket' palette
 
@@ -44,7 +45,6 @@ plt.plot(T_RANGE, no_amp, color=palette[0], label="no amp")
 plt.xlabel("Normalized Time")
 plt.ylabel("mV")
 plt.ylim([-20,20])
-plt.legend(loc="best")
 
 if is_production:
     plt.savefig(f"results/{typeModel}/svg/maxpotX={pos}microns.svg", format="svg", bbox_inches="tight")

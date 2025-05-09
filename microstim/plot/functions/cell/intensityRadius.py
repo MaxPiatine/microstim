@@ -26,6 +26,7 @@ max_rho_e = data["y1"]
 max_rho_i = data["y2"]
 max_no_rho = data["y3"]
 
+fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
 sns.set_theme(style="ticks")
 palette = sns.color_palette("rocket_r", n_colors=3) 
 ax = plt.subplot(111)
@@ -36,7 +37,6 @@ plt.ylabel("radius")
 plt.plot(intensity, max_no_rho, color=palette[0], label="no amp")
 plt.plot(intensity, max_rho_e, color=palette[1], label="exc amp")
 plt.plot(intensity, max_rho_i, color=palette[2], label="inh amp")
-plt.legend(loc="best")  
 
 if is_production:
     plt.savefig(f"results/{typeModel}/svg/intensityRadius.svg", format="svg", bbox_inches="tight")
