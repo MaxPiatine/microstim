@@ -19,12 +19,15 @@ else:
     typeModel += "Histed"
 
 path = f"results/{typeModel}/potHeat.npz"
-data = np.load(path)
+data = np.load(path, mmap_mode="r")
 
 t_range = data["x"]
 x_range = data["y"]
 v_e = data["z"]
 
+fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
+fig.clf()
+ax = plt.axes([0.15, 0.18, 0.8, 0.8])
 fig, ax = plt.subplots()
 cs = ax.contourf(t_range, x_range, v_e.T, 
                 cmap=cm.PuBu_r,
@@ -34,8 +37,8 @@ cs = ax.contourf(t_range, x_range, v_e.T,
 ax.set_xlabel("Time (ms)")
 ax.set_ylabel("Distance (μm)")
 fig.suptitle("Sub-threshold voltage by distance and time")
-ax.set_xlim(right=max(t_range))
-ax.set_ylim(top=max(x_range))
+ax.set_xlim(0, 70)
+ax.set_ylim(0, 1500)
 cbar = fig.colorbar(cs, label="Voltage (mV)")
 
 if is_production:

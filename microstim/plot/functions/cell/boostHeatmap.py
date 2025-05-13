@@ -22,11 +22,12 @@ else:
 
 path = f"results/{typeModel}/boost_heatmap.npy"
 heatmap = np.load(path)
+heatmap_capped = np.clip(heatmap, 0,1500)
 
 fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
 fig.clf()
 ax = plt.axes([0.15, 0.18, 0.8, 0.8])
-cs = ax.contourf(ranges, ranges, heatmap.T, cmap=cm.PuBu_r, vmin=0, vmax=1000, levels=20)
+cs = ax.contourf(ranges, ranges, heatmap_capped.T, cmap=cm.PuBu_r, vmin=0, vmax=1500, levels=10)
 fig.colorbar(cs)
 
 if is_depolarized:
