@@ -29,6 +29,7 @@ heatmap_capped = np.clip(heatmap, 0, 1500)
 fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
 fig.clf()
 ax = plt.axes([0.15, 0.18, 0.8, 0.8])
+ax.set_ylim(200, 1000)
 cs = ax.contourf(inh_RANGE, Wei_RANGE, heatmap_capped.T, cmap=cm.PuBu_r, vmin=0, vmax=1500, levels=10)
 fig.colorbar(cs)
 
