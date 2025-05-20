@@ -11,4 +11,5 @@ microstim/plot/results/*.png
 
 *npz*
 *npy*
+*pyc*
 *svg*
