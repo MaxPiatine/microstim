@@ -10,3 +10,5 @@ results/Stoney/svg/
 *svg*
 *npz*
 *npy*
+*.pyc*
+*.DS_Store
