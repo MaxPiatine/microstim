@@ -13,3 +13,4 @@ microstim/plot/results/*.png
 *npy*
 *pyc*
 *svg*
+.DS_Store
