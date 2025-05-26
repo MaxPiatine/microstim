@@ -9,6 +9,8 @@ flags
 --position # distance between stim and cell
 ```
 ## Assets
-![alt text](assets/graphs.png)
+![alt text](assets/Stoney.pdf)
 
-![alt text](assets/desc.png)
+![alt text](assets/Histed.pdf)
+
+![alt text](assets/axons.png)
