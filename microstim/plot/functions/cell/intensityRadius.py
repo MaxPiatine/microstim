@@ -1,20 +1,12 @@
 import matplotlib.pylab as plt
 import seaborn as sns
 import numpy as np
-import argparse
 
-from microstim.globals import intensity, depol_weights, depol_sigma, act_weights, act_sigma, gamma, start_boost, no_boost, no_boost_weights, X_RANGE
+from microstim.config import intensity, depol_weights, depol_sigma, act_weights, act_sigma, gamma, start_boost, no_boost, no_boost_weights, X_RANGE
 from microstim.main import model
 from microstim.utils import rect
 
-parser = argparse.ArgumentParser(description="the maximum radius attained at different intensities")
-parser.add_argument("--is_depol", action="store_true", help="Run depolarization model")
-parser.add_argument("--is_prod", action="store_true", help="Run for production")
 
-args = parser.parse_args()
-
-is_depolarized = args.is_depol
-is_production = args.is_prod
 typeModel = ""
 
 if is_depolarized:
