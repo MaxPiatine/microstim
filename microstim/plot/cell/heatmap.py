@@ -4,7 +4,7 @@ import seaborn as sns
 
 from microstim.main import model
 from microstim.utils import rect
-from microstim.plot.functions.cell.utils import setup
+from microstim.plot.cell.utils import setup
 
 def main():
     global config, is_depol, is_prod

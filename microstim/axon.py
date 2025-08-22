@@ -1,9 +1,16 @@
 import math
 import numpy as np
 from microstim.utils import intensityPDF, intensityTreshold
-from microstim.globals import MU_E, MU_I, STDEV_E, STDEV_I, STEP, RHEOBASE, axon_linspace
+from microstim.config import config, AXON_LINSPACE
 
 checkNormalized = False
+
+MU_E = config["MU_E"]
+MU_I = config["MU_I"]
+STDEV_E = config["STDEV_E"]
+STDEV_I = config["STDEV_I"]
+STEP = config["STEP"]
+RHEOBASE = config["RHEOBASE"]
 
 def axon(intensity_at_axon, axon_diameter=None):
     if axon_diameter:
@@ -14,7 +21,7 @@ def axon(intensity_at_axon, axon_diameter=None):
         linspace = np.arange(RHEOBASE, intensity_at_axon, STEP)    
             
     else:
-        linspace = axon_linspace
+        linspace = AXON_LINSPACE
 
 
     if checkNormalized and axon_diameter is None:

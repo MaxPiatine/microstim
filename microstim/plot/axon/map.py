@@ -1,9 +1,8 @@
 import matplotlib.pylab as plt
 import seaborn as sns
-import numpy as np
 
 from microstim.axon import axonMapping
-from microstim.globals import ALPHA
+from microstim.config import ALPHA
 
 """
 we have a slice of 500 x 500 microns and we want to see how many axons will be recruited.

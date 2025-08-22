@@ -3,7 +3,7 @@ import seaborn as sns
 import numpy as np
 
 from microstim.axon import axonMapping
-from microstim.globals import ALPHA, RHEOBASE
+from microstim.config import ALPHA, RHEOBASE
 
 intensity = np.arange(RHEOBASE, 20, 0.1) #microAmp mm
 axons = 100

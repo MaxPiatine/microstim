@@ -9,7 +9,7 @@ import matplotlib.animation as animation
 from PIL import Image
 
 from microstim.axon import axonMapping
-from microstim.globals import ALPHA, RHEOBASE, current_dir
+from microstim.config import ALPHA, RHEOBASE, current_dir
 
 files_path = current_dir + "/plot/results/"
 

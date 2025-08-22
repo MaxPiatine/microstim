@@ -2,7 +2,7 @@ import matplotlib.pylab as plt
 import seaborn as sns
 
 from microstim.axon import axon
-from microstim.globals import axon_linspace, RHEOBASE
+from microstim.config import axon_linspace, RHEOBASE
 
 prod=False
 # distance = 10 #microns 
