@@ -2,6 +2,7 @@ import argparse
 import importlib
 import yaml
 import sys
+import seaborn as sns
 
 # Load config.yaml
 with open("config.yaml", "r") as f:
@@ -17,9 +18,25 @@ args = parser.parse_args()
 
 # Map function names to module paths
 functions = {
-    "heatmap": "microstim.plot.functions.cell.heatmap",
-    "radii": "microstim.plot.functions.cell.radii",
-    "maxpotDistance": "microstim.plot.functions.cell.maxpotDistance",
+    "heatmap": "microstim.plot.cell.heatmap",
+    "radii": "microstim.plot.cell.radii",
+    "boostHeatmap": "microstim.plot.cell.boostHeatmap",
+    "gif": "microstim.plot.cell.gif",
+    "heatmapRadiusPot": "microstim.plot.cell.heatmapRadiusPot",
+    "intensityPotential": "microstim.plot.cell.intensityPotential",
+    "intensityRadius": "microstim.plot.cell.intensityRadius",
+    "maxpotPosition": "microstim.plot.cell.maxpotPosition",
+    "maxpotDistance": "microstim.plot.cell.maxpotDistance",
+    "weightsHeatmap": "microstim.plot.cell.weightsHeatmap",
+
+    "ratios": "microstim.plot.axon.ratios",
+    "distributions": "microstim.plot.axon.distributions",
+    "EI": "microstim.plot.axon.EI",
+    "intensity": "microstim.plot.axon.intensity",
+    "map": "microstim.plot.axon.map",
+    "mapintensity": "microstim.plot.axon.mapintensity",
+    "intensitygif": "microstim.plot.axon.intensitygif",
+    "mapgif": "microstim.plot.axon.mapgif",
 }
 
 if args.function not in functions:
@@ -29,11 +46,14 @@ if args.function not in functions:
 module_path = functions[args.function]
 module = importlib.import_module(module_path)
 
+palette = sns.color_palette("mako_r", n_colors=3) 
+
 # config and flags as globals in the module
 setattr(module, "config", config)
 setattr(module, "is_depol", args.is_depol)
 setattr(module, "is_prod", args.is_prod)
 setattr(module, "position", args.position)
+setattr(module, "palette", palette)
 
 if hasattr(module, "main"):
     module.main()

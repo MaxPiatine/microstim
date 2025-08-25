@@ -9,7 +9,7 @@ MU_E = config["MU_E"]
 MU_I = config["MU_I"]
 STDEV_E = config["STDEV_E"]
 STDEV_I = config["STDEV_I"]
-STEP = config["STEP"]
+STEP = float(config["STEP"])
 RHEOBASE = config["RHEOBASE"]
 
 def axon(intensity_at_axon, axon_diameter=None):

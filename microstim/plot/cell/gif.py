@@ -13,7 +13,7 @@ from microstim.plot.cell.utils import setup
 files_path = current_dir + "/plot/results/"
 
 def main():
-    global config, is_depol, is_prod
+    global config, is_depol
     weights, boost, sigma, typeModel = setup(config, is_depol)
     
     v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(config["intensity"], weights, sigma, rect, boost, is_depolarized=is_depol)
