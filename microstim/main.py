@@ -1,41 +1,44 @@
-import torch
 import torch.nn.functional as F
+import torch
 import numpy as np
 import time
 
-from microstim.globals import N, i_RANGE, X_RANGE, ALPHA, R, P, DT, TAU, SYN, THRESHOLD
-from microstim.utils import maxRadius, normal, plot_tn, k_e, k_i, spectral_convolution, KernelConvolution
+from microstim.config import config, DEVICE
+from microstim.utils import maxRadius, normal, plot_tn, zeros
 
 usingFFT = False
 gif = False
 
+N = config["N"]
+X = config["distance"]
+P = config["P"]
+R = config["R"]
+Rm = config["Rm"]
+DT = config["dt"]
+DX = config["dx"]
+TAU = config["TAU"]
+ALPHA = config["ALPHA"]
+THRESHOLD = config["THRESHOLD"]
+DISTANCE_RANGE = torch.tensor(np.arange(0, X, DX), dtype=torch.float32, device=DEVICE)
+L = DISTANCE_RANGE.shape[0]
+
 def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_only=False):
     start = time.time()
 
-    # Set device to MPS (Metal Performance Shaders) for Apple Silicon
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-    
-    # Convert arrays to PyTorch tensors
-    X_RANGE_tensor = torch.tensor(X_RANGE, dtype=torch.float32, device=device)
-    
-    # Pre-allocate tensors on GPU
-    rho_e = torch.zeros(N, dtype=torch.float32, device=device)
-    rho_i = torch.zeros(N, dtype=torch.float32, device=device)
-    nu_e = torch.zeros((len(i_RANGE), len(X_RANGE_tensor)), dtype=torch.float32, device=device)
-    nu_i = torch.zeros((len(i_RANGE), len(X_RANGE_tensor)), dtype=torch.float32, device=device)
-    v_e = torch.zeros((len(i_RANGE), len(X_RANGE_tensor)), dtype=torch.float32, device=device)
-    v_i = torch.zeros((len(i_RANGE), len(X_RANGE_tensor)), dtype=torch.float32, device=device)
+    rho_e, rho_i = zeros(N), zeros(N) # radii
+    nu_e, nu_i = zeros((N, L)), zeros((N, L)) # firing rates
+    v_e, v_i = zeros((N, L)), zeros((N, L)) # membrane potentials
     
     # Pre-compute synaptic weights and kernels
-    ee_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], len(X_RANGE)) 
-    ie_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], len(X_RANGE)) 
-    ei_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], len(X_RANGE)) 
-    ii_linspace = np.linspace(-4*sigma["ii"], 4*sigma["ii"], len(X_RANGE))
+    ee_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], X) 
+    ie_linspace = np.linspace(-4*sigma["ie"], 4*sigma["ie"], X) 
+    ei_linspace = np.linspace(-4*sigma["ei"], 4*sigma["ei"], X) 
+    ii_linspace = np.linspace(-4*sigma["ii"], 4*sigma["ii"], X)
 
-    ee_linspace_tensor = torch.tensor(ee_linspace, dtype=torch.float32, device=device)
-    ie_linspace_tensor = torch.tensor(ie_linspace, dtype=torch.float32, device=device)
-    ei_linspace_tensor = torch.tensor(ei_linspace, dtype=torch.float32, device=device)
-    ii_linspace_tensor = torch.tensor(ii_linspace, dtype=torch.float32, device=device)
+    ee_linspace_tensor = torch.tensor(ee_linspace, dtype=torch.float32, device=DEVICE)
+    ie_linspace_tensor = torch.tensor(ie_linspace, dtype=torch.float32, device=DEVICE)
+    ei_linspace_tensor = torch.tensor(ei_linspace, dtype=torch.float32, device=DEVICE)
+    ii_linspace_tensor = torch.tensor(ii_linspace, dtype=torch.float32, device=DEVICE)
 
     wee = weights["ee"] * normal(ee_linspace_tensor, sigma["ee"])
     wie = weights["ie"] * normal(ie_linspace_tensor, sigma["ie"])
@@ -60,17 +63,17 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
         """
         depolarized model
         """
-        v_e[0] = R*intensity/(X_RANGE_tensor + ALPHA)**P * boost["exc"]
-        v_i[0] = R*intensity/(X_RANGE_tensor + ALPHA)**P * boost["inh"]
+        v_e[0] = R*intensity/(DISTANCE_RANGE + ALPHA)**P * boost["exc"]
+        v_i[0] = R*intensity/(DISTANCE_RANGE + ALPHA)**P * boost["inh"]
         
         nu_e[0] = rate(v_e[0])
         nu_i[0] = rate(v_i[0])
         
         if radius_only:
-            rho_e[0] = maxRadius(v_e[0], X_RANGE_tensor, THRESHOLD)
-            rho_i[0] = maxRadius(v_i[0], X_RANGE_tensor, THRESHOLD)
+            rho_e[0] = maxRadius(v_e[0], DISTANCE_RANGE, THRESHOLD)
+            rho_i[0] = maxRadius(v_i[0], DISTANCE_RANGE, THRESHOLD)
 
-    for i in range(0, len(i_RANGE)-1):
+    for i in range(0, N-1):
         if i % 100 == 0:
             print("i: ", i, ", time: ", time.time() - start)
 
@@ -78,8 +81,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
             continue
         elif not is_depolarized and i*DT==2:
             print(i, "2ms")
-            nu_e[i] = np.log(intensity) * boost["exc"] * normal(X_RANGE_tensor, sigma["ee"])
-            nu_i[i] = np.log(intensity) * boost["inh"] * normal(X_RANGE_tensor, sigma["ii"])
+            nu_e[i] = np.log(intensity) * boost["exc"] * normal(DISTANCE_RANGE, sigma["ee"])
+            nu_i[i] = np.log(intensity) * boost["inh"] * normal(DISTANCE_RANGE, sigma["ii"])
 
         if usingFFT:
             nu_e_fft = torch.fft.fft(nu_e[i])
@@ -102,8 +105,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
             conv_wii = F.conv1d(nu_i_current, wii, padding='same').squeeze()
         
         # Update voltages
-        v_e[i+1] = v_e[i] + DT * (-1/TAU * v_e[i] + (conv_wee - conv_wie)/SYN)
-        v_i[i+1] = v_i[i] + DT * (-1/TAU * v_i[i] + (conv_wei - conv_wii)/SYN)
+        v_e[i+1] = v_e[i] + DT/TAU * (v_e[i] + Rm*(conv_wee - conv_wie))
+        v_i[i+1] = v_i[i] + DT/TAU * (v_i[i] + Rm*(conv_wei - conv_wii))
         
         # Update rates
         nu_e[i+1] = rate(v_e[i+1])
@@ -111,14 +114,12 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
         
         # Compute maxRadius
         if radius_only:
-            # 0.26 seconds
-            # radius_start = time.time()
-            rho_e[i+1] = maxRadius(v_e[i+1], X_RANGE_tensor, THRESHOLD)
-            rho_i[i+1] = maxRadius(v_i[i+1], X_RANGE_tensor, THRESHOLD)
-            # print(f"MaxRadius time: {time.time() - radius_start} seconds")
+            # 0.26 seconds 
+            rho_e[i+1] = maxRadius(v_e[i+1], DISTANCE_RANGE, THRESHOLD)
+            rho_i[i+1] = maxRadius(v_i[i+1], DISTANCE_RANGE, THRESHOLD)
         
         if gif:
-            plot_tn([v_e[i].cpu().numpy(), v_i[i].cpu().numpy()], i)
+            plot_tn([v_e[i].cpu().numpy(), v_i[i].cpu().numpy()], i*DT, DISTANCE_RANGE.cpu().numpy())
         
 
     end = time.time()
