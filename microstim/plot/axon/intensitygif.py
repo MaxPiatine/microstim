@@ -8,14 +8,14 @@ import numpy as np
 
 from PIL import Image
 
-from microstim.axon import axon, RHEOBASE, STEP
+from microstim.axon import axon, RHEOBASE
 from microstim.config import AXON_LINSPACE, current_dir
 
 files_path = current_dir + "/plot/results/"
 os.makedirs(files_path, exist_ok=True)
 
 def main():
-    global config, is_prod
+    global config
     # Intensity sweep range
     intensities = np.arange(8.7, 12, 0.01)
 

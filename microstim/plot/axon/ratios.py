@@ -1,8 +1,7 @@
 import matplotlib.pylab as plt
 import seaborn as sns
 
-from microstim.axon import axon
-from microstim.config import AXON_LINSPACE
+from microstim.axon import axon, AXON_LINSPACE
 
 def main():
     global config, is_prod

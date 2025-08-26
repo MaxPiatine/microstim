@@ -10,8 +10,8 @@ def main():
     global config, is_depol, is_prod
     weights, boost, sigma, typeModel = setup(config, is_depol)
     
-    max_rho_e = []
-    max_rho_i = []
+    max_rho_e = [max(model(intensity, weights, sigma, rect, boost, is_depolarized=is_depol)[2]) for intensity in intensities]
+    max_rho_i = [max(model(intensity, weights, sigma, rect, boost, is_depolarized=is_depol)[3]) for intensity in intensities]
     max_no_rho = []
     intensities = np.arange(0, 300, 25)
     for intensity in intensities:

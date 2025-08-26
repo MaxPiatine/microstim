@@ -2,8 +2,7 @@ import matplotlib.pylab as plt
 import seaborn as sns
 import numpy as np
 
-from microstim.axon import axon, RHEOBASE, STEP
-from microstim.config import AXON_LINSPACE
+from microstim.axon import axon, RHEOBASE, STEP, AXON_LINSPACE
 
 def main():
     global config, is_prod

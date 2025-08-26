@@ -4,7 +4,7 @@ import numpy as np
 
 from microstim.main import model
 from microstim.utils import rect
-from microstim.plot.cell.utils import setup
+from microstim.plot.cell.utils import setup, intensities
 
 def main():
     global config, is_depol, is_prod, position
@@ -12,7 +12,6 @@ def main():
 
     max_pot = []
     no_pot = []
-    intensities = np.arange(0.25, 300, 25)
 
     for intensity in intensities:
         print("intensity %f" % intensity)
@@ -29,8 +28,8 @@ def main():
     ax.spines['right'].set_visible(False)
     plt.xlabel("intensity")
     plt.ylabel("mV")
-    plt.plot(intensity, no_pot, color=palette[0], label="no amp")
-    plt.plot(intensity, max_pot, color=palette[1], label="exc amp")
+    plt.plot(intensities, no_pot, color=palette[0], label="no amp")
+    plt.plot(intensities, max_pot, color=palette[1], label="exc amp")
     plt.legend(loc="best")  
 
     if is_prod:

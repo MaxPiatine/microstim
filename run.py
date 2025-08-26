@@ -46,14 +46,11 @@ if args.function not in functions:
 module_path = functions[args.function]
 module = importlib.import_module(module_path)
 
-palette = sns.color_palette("mako_r", n_colors=3) 
-
 # config and flags as globals in the module
 setattr(module, "config", config)
 setattr(module, "is_depol", args.is_depol)
 setattr(module, "is_prod", args.is_prod)
 setattr(module, "position", args.position)
-setattr(module, "palette", palette)
 
 if hasattr(module, "main"):
     module.main()

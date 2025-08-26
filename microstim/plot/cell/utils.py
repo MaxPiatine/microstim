@@ -1,3 +1,6 @@
+import numpy as np
+from microstim.main import N, DT
+
 def setup(config, is_depol):
     typeModel = ""
     if is_depol:
@@ -11,3 +14,6 @@ def setup(config, is_depol):
 
     sigma = config["sigmas"].copy()
     return weights, boost, sigma, typeModel
+
+intensities = np.arange(0.25, 300, 25)
+TIME_RANGE = np.arange(0, N * DT, DT)

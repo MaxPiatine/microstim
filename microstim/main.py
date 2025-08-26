@@ -3,27 +3,31 @@ import torch
 import numpy as np
 import time
 
-from microstim.config import config, DISTANCE_RANGE, TIME_RANGE, DEVICE
+from microstim.config import config, DEVICE
 from microstim.utils import maxRadius, normal, plot_tn, zeros
 
 usingFFT = False
 gif = False
-N = TIME_RANGE.shape[0]
-X = DISTANCE_RANGE.shape[0]
+
+N = config["N"]
+X = config["distance"]
 P = config["P"]
 R = config["R"]
 Rm = config["Rm"]
 DT = config["dt"]
+DX = config["dx"]
 TAU = config["TAU"]
 ALPHA = config["ALPHA"]
 THRESHOLD = config["THRESHOLD"]
+DISTANCE_RANGE = torch.tensor(np.arange(0, X, DX), dtype=torch.float32, device=DEVICE)
+L = DISTANCE_RANGE.shape[0]
 
 def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_only=False):
     start = time.time()
 
     rho_e, rho_i = zeros(N), zeros(N) # radii
-    nu_e, nu_i = zeros((N, X)), zeros((N, X)) # firing rates
-    v_e, v_i = zeros((N, X)), zeros((N, X)) # membrane potentials
+    nu_e, nu_i = zeros((N, L)), zeros((N, L)) # firing rates
+    v_e, v_i = zeros((N, L)), zeros((N, L)) # membrane potentials
     
     # Pre-compute synaptic weights and kernels
     ee_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], X) 

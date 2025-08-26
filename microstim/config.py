@@ -12,8 +12,3 @@ def load_config():
 config = load_config()
 
 DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-DISTANCE_RANGE = torch.tensor(np.arange(0, config["distance"], config["dx"]), dtype=torch.float32, device=DEVICE)
-TIME_RANGE = torch.tensor(np.arange(0, config["N"]), dtype=torch.float32, device=DEVICE)
-
-AXON_LINSPACE = np.arange(config["RHEOBASE"], 20, float(config["STEP"]))
-

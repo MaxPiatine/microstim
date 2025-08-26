@@ -1,8 +1,7 @@
 import matplotlib.pylab as plt
 import seaborn as sns
 
-from microstim.axon import axonMapping
-from microstim.config import ALPHA
+from microstim.axon import axonMapping, ALPHA
 
 """
 we have a slice of 500 x 500 microns and we want to see how many axons will be recruited.
@@ -14,7 +13,7 @@ If we minimally assume that there is 1 axon to each neuron then we would have
 """
 
 def main():
-    global config, is_depol, is_prod
+    global config, is_prod
     
     intensity = 6 #microAmp mm
     axons = 100 # number of axons in slice

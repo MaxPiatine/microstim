@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from microstim.utils import intensityPDF, intensityTreshold
-from microstim.config import config, AXON_LINSPACE
+from microstim.config import config
 
 checkNormalized = False
 
@@ -11,6 +11,8 @@ STDEV_E = config["STDEV_E"]
 STDEV_I = config["STDEV_I"]
 STEP = float(config["STEP"])
 RHEOBASE = config["RHEOBASE"]
+ALPHA = config["ALPHA"]
+AXON_LINSPACE = np.arange(RHEOBASE, 20, STEP)
 
 def axon(intensity_at_axon, axon_diameter=None):
     if axon_diameter:

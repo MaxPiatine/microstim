@@ -1,7 +1,7 @@
 import matplotlib.pylab as plt
 import numpy as np
-import seaborn as sns
 
+from matplotlib import cm
 from microstim.main import model
 from microstim.utils import rect
 from microstim.plot.cell.utils import setup
@@ -23,19 +23,17 @@ def main():
             heatmap[x][y] += max(rho_e)
 
 
-    # Create the heatmap using seaborn
-    plt.figure(figsize=(8, 6))
-    ax = sns.heatmap(
-        heatmap,
-        annot=True,
-        xticklabels=np.round(Wei_RANGE, 2),  
-        yticklabels=np.round(inh_RANGE, 2),  
-        linewidths=0.5, 
-    )
-
-    ax.invert_yaxis()
+    
+    fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
+    fig.clf()
+    ax = plt.axes([0.15, 0.18, 0.8, 0.8])
     ax.set_xlabel("inh boost")
     ax.set_ylabel(r"$w_{ei}$")
+    ax.set_ylim(200, 1000)
+    
+    cs = ax.contourf(inh_RANGE, Wei_RANGE, heatmap.T, cmap=cm.PuBu_r, vmin=0, vmax=1500, levels=10)
+    fig.colorbar(cs)
+    ax.invert_yaxis()
 
     if is_prod:
         plt.savefig(f"results/{typeModel}/svg/heatmap.svg", format="svg", bbox_inches="tight")

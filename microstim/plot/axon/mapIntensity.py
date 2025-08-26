@@ -2,12 +2,12 @@ import matplotlib.pylab as plt
 import seaborn as sns
 import numpy as np
 
-from microstim.axon import axonMapping
+from microstim.axon import axonMapping, STEP, RHEOBASE
 
 def main():
     global config
 
-    intensity = np.arange(config["RHEOBASE"], 20, 0.1) #microAmp mm
+    intensity = np.arange(RHEOBASE+STEP, 20, 0.1) #microAmp mm
     axons = 100
     chunk = 200
     stim_radius = 1 + config["ALPHA"]  # stimulation radius in microns
@@ -23,7 +23,7 @@ def main():
     ax.spines['right'].set_visible(False)
 
     # Shade the region below RHEOBASE
-    plt.axvspan(0, config["RHEOBASE"], color='gray', alpha=0.2, label="Below Rheobase")
+    plt.axvspan(0, RHEOBASE, color='gray', alpha=0.2, label="Below Rheobase")
     plt.plot(intensity, ratios, color=palette[0])
     plt.xlabel("intensity threshold [μA]")
     plt.ylabel("ratio I/E")

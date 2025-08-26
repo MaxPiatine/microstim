@@ -11,7 +11,9 @@ def main():
     weights, boost, sigma, typeModel = setup(config, is_depol)
 
     v_e, v_i, _, _, _, _ = model(config["intensity"], weights, sigma, rect, boost, is_depolarized=is_depol)
-    no_amp, _, _, _, _, _ = model(config["intensity"], config["no_boost_weights"], sigma, rect, config["no_boost"], is_depolarized=is_depol)
+
+    if is_prod:
+        no_amp, _, _, _, _, _ = model(config["intensity"], config["no_boost_weights"], sigma, rect, config["no_boost"], is_depolarized=is_depol)
 
     # Use the Seaborn palette colors
     sns.set_theme(style="ticks")

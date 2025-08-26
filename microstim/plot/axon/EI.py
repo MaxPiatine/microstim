@@ -1,11 +1,14 @@
 import matplotlib.pylab as plt
 import seaborn as sns
 
-from microstim.axon import axon
-from microstim.config import AXON_LINSPACE, RHEOBASE
+from microstim.axon import axon, RHEOBASE, AXON_LINSPACE
 
 def main():
     global config, is_prod
+
+    """
+    Constants need to find a place
+    """
     distance = 10 #microns 
     intensity_0 = 100 #microAmps
     intensity = intensity_0/distance
