@@ -46,7 +46,7 @@ Microstim is a scientific Python package for simulating and analyzing axonal and
 
 All simulation parameters are stored in `config.yaml` at the project root. Edit this file to change model settings, stimulation parameters, or analysis options.
 
-# Usage
+## Usage
 
 Run any function using the script:
 ```bash  
