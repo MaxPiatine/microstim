@@ -105,8 +105,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
             conv_wii = F.conv1d(nu_i_current, wii, padding='same').squeeze()
         
         # Update voltages
-        v_e[i+1] = v_e[i] + DT/TAU * (v_e[i] + Rm*(conv_wee - conv_wie))
-        v_i[i+1] = v_i[i] + DT/TAU * (v_i[i] + Rm*(conv_wei - conv_wii))
+        v_e[i+1] = v_e[i] + DT * (-v_e[i]/TAU + Rm*(conv_wee - conv_wie))
+        v_i[i+1] = v_i[i] + DT * (-v_i[i]/TAU + Rm*(conv_wei - conv_wii))
         
         # Update rates
         nu_e[i+1] = rate(v_e[i+1])

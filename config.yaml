@@ -1,22 +1,22 @@
-N: 1200 #total steps
-dt: 0.01 #ms
-distance: 2000 #micrometers
-dx: 0.1 #micrometer
+N: 4000 #total steps
+dt: 0.001 #ms
+distance: 500 #micrometers
+dx: 0.01 #micrometer
 
 R: 7 #resistance from electrode to neuron
-Rm: 100 #membrane resistance
 ALPHA: 4 #offset parameter
 BETA: 1 
 TAU: 10 #ms
+Rm: 0.2 #membrane resistance
 THRESHOLD: 20 #mV
 intensity: 500 #microamps
 P: 2 #Power law
 
 sigmas:
-  ee: 127
-  ie: 96.6
-  ei: 99.84
-  ii: 126.77
+  ee: 150
+  ie: 150
+  ei: 150
+  ii: 150
 
 #Activation init
 act_weights:
@@ -31,10 +31,10 @@ gamma:
 
 #Depolarization init
 depol_weights:
-  ee: 230
-  ie: 150
-  ei: 150
-  ii: 25
+  ee: 400
+  ie: 250
+  ei: 250
+  ii: 100
 
 start_boost: # direct electric effect
   exc: 1

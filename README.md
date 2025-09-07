@@ -30,7 +30,7 @@ Microstim is a scientific Python package for simulating and analyzing axonal and
     cd microstim
    ```
 
-2. **(Optional) Create and activate a virtual environment**
+2. **Create and activate a virtual environment**
    ```bash
     python -m venv venv
     source venv/bin/activate   # On Linux/Mac
