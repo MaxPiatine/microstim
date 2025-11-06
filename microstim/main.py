@@ -24,16 +24,16 @@ L = DISTANCE_RANGE.shape[0]
 
 def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_only=False):
     start = time.time()
-
+    print(N, L)
     rho_e, rho_i = zeros(N), zeros(N) # radii
     nu_e, nu_i = zeros((N, L)), zeros((N, L)) # firing rates
     v_e, v_i = zeros((N, L)), zeros((N, L)) # membrane potentials
     
     # Pre-compute synaptic weights and kernels
-    ee_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], X) 
-    ie_linspace = np.linspace(-4*sigma["ie"], 4*sigma["ie"], X) 
-    ei_linspace = np.linspace(-4*sigma["ei"], 4*sigma["ei"], X) 
-    ii_linspace = np.linspace(-4*sigma["ii"], 4*sigma["ii"], X)
+    ee_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], L) 
+    ie_linspace = np.linspace(-4*sigma["ie"], 4*sigma["ie"], L) 
+    ei_linspace = np.linspace(-4*sigma["ei"], 4*sigma["ei"], L) 
+    ii_linspace = np.linspace(-4*sigma["ii"], 4*sigma["ii"], L)
 
     ee_linspace_tensor = torch.tensor(ee_linspace, dtype=torch.float32, device=DEVICE)
     ie_linspace_tensor = torch.tensor(ie_linspace, dtype=torch.float32, device=DEVICE)
@@ -95,7 +95,7 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
             conv_wii = torch.fft.ifft(nu_i_fft * wii_fft).real
         else:
 
-            nu_e_current = nu_e[i].unsqueeze(0).unsqueeze(0)  # Shape: (1, 1, len(X_RANGE))
+            nu_e_current = nu_e[i].unsqueeze(0).unsqueeze(0) 
             nu_i_current = nu_i[i].unsqueeze(0).unsqueeze(0)
 
             # Convolutions
@@ -105,8 +105,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
             conv_wii = F.conv1d(nu_i_current, wii, padding='same').squeeze()
         
         # Update voltages
-        v_e[i+1] = v_e[i] + DT * (-v_e[i]/TAU + Rm*(conv_wee - conv_wie))
-        v_i[i+1] = v_i[i] + DT * (-v_i[i]/TAU + Rm*(conv_wei - conv_wii))
+        v_e[i+1] = v_e[i] + DT * (-v_e[i] + Rm*(conv_wee - conv_wie))/TAU
+        v_i[i+1] = v_i[i] + DT * (-v_i[i] + Rm*(conv_wei - conv_wii))/TAU
         
         # Update rates
         nu_e[i+1] = rate(v_e[i+1])
