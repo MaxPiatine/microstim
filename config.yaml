@@ -1,6 +1,6 @@
-N: 1000 #total steps
-dt: 0.01 #ms
-distance: 2000 #micrometers
+N: 120 #total steps
+dt: 0.1 #ms
+distance: 1500 #micrometers
 dx: 0.1 #micrometer
 
 R: 7 #resistance from electrode to neuron
@@ -13,6 +13,12 @@ intensity: 500 #microamps
 P: 2 #Power law
 
 # For better depol plots use sigmas = 130
+# sigmas:
+#   ee: 120
+#   ie: 120
+#   ei: 120
+#   ii: 120
+
 sigmas:
   ee: 127
   ie: 96.6
@@ -22,12 +28,12 @@ sigmas:
 #Activation init
 act_weights:
   ee: 600
-  ie: 800
+  ie: 400
   ei: 600
   ii: 150
 
 gamma:
-  exc: 600
+  exc: 650
   inh: 150
 
 #Depolarization init

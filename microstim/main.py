@@ -6,6 +6,8 @@ import time
 from microstim.config import config, DEVICE
 from microstim.utils import maxRadius, normal, plot_tn, zeros
 
+import matplotlib.pylab as plt
+
 usingFFT = False
 gif = False
 
@@ -24,26 +26,45 @@ L = DISTANCE_RANGE.shape[0]
 
 def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_only=False):
     start = time.time()
-    print(N, L)
+    is_transient = 0
     rho_e, rho_i = zeros(N), zeros(N) # radii
     nu_e, nu_i = zeros((N, L)), zeros((N, L)) # firing rates
     v_e, v_i = zeros((N, L)), zeros((N, L)) # membrane potentials
     
     # Pre-compute synaptic weights and kernels
-    ee_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], L) 
-    ie_linspace = np.linspace(-4*sigma["ie"], 4*sigma["ie"], L) 
-    ei_linspace = np.linspace(-4*sigma["ei"], 4*sigma["ei"], L) 
-    ii_linspace = np.linspace(-4*sigma["ii"], 4*sigma["ii"], L)
+    # ee_linspace = np.linspace(-4*sigma["ee"], 4*sigma["ee"], L) 
+    # ie_linspace = np.linspace(-4*sigma["ie"], 4*sigma["ie"], L) 
+    # ei_linspace = np.linspace(-4*sigma["ei"], 4*sigma["ei"], L) 
+    # ii_linspace = np.linspace(-4*sigma["ii"], 4*sigma["ii"], L)
 
-    ee_linspace_tensor = torch.tensor(ee_linspace, dtype=torch.float32, device=DEVICE)
-    ie_linspace_tensor = torch.tensor(ie_linspace, dtype=torch.float32, device=DEVICE)
-    ei_linspace_tensor = torch.tensor(ei_linspace, dtype=torch.float32, device=DEVICE)
-    ii_linspace_tensor = torch.tensor(ii_linspace, dtype=torch.float32, device=DEVICE)
+    # ee_linspace_tensor = torch.tensor(ee_linspace, dtype=torch.float32, device=DEVICE)
+    # ie_linspace_tensor = torch.tensor(ie_linspace, dtype=torch.float32, device=DEVICE)
+    # ei_linspace_tensor = torch.tensor(ei_linspace, dtype=torch.float32, device=DEVICE)
+    # ii_linspace_tensor = torch.tensor(ii_linspace, dtype=torch.float32, device=DEVICE)
 
-    wee = weights["ee"] * normal(ee_linspace_tensor, sigma["ee"])
-    wie = weights["ie"] * normal(ie_linspace_tensor, sigma["ie"])
-    wei = weights["ei"] * normal(ei_linspace_tensor, sigma["ei"])
-    wii = weights["ii"] * normal(ii_linspace_tensor, sigma["ii"])
+    # wee = weights["ee"] * normal(ee_linspace_tensor, sigma["ee"])
+    # wie = weights["ie"] * normal(ie_linspace_tensor, sigma["ie"])
+    # wei = weights["ei"] * normal(ei_linspace_tensor, sigma["ei"])
+    # wii = weights["ii"] * normal(ii_linspace_tensor, sigma["ii"])
+    # Choose kernel support multiplier (4 or 5 recommended; increase for higher accuracy)
+    K_FACTOR = 4.0
+
+    def make_kernel(sigma_val, weight_val):
+        # radius in samples (at spatial resolution DX)
+        radius_samples = max(1, int(np.ceil((K_FACTOR * sigma_val) / DX)))
+        # create coordinates in micrometers sampled at DX
+        x = torch.linspace(-radius_samples * DX, radius_samples * DX,
+                           2 * radius_samples + 1, dtype=torch.float32, device=DEVICE)
+        k = normal(x, sigma_val)  # expected to return torch tensor
+        k = k / k.sum()           # normalize kernel area to 1
+        k = k * weight_val        # scale by synaptic weight
+        # ensure odd kernel length so 'same' padding is symmetric
+        return k.unsqueeze(0).unsqueeze(0)  # shape (1,1,klen)
+
+    wee = make_kernel(sigma["ee"], weights["ee"])
+    wie = make_kernel(sigma["ie"], weights["ie"])
+    wei = make_kernel(sigma["ei"], weights["ei"])
+    wii = make_kernel(sigma["ii"], weights["ii"])
     
     if usingFFT:
         # Pre-compute FFTs of kernels
@@ -52,11 +73,12 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
         wei_fft = torch.fft.fft(wei)
         wii_fft = torch.fft.fft(wii)
     else:
-        # Reshape the weights for convolution
-        wee = wee.unsqueeze(0).unsqueeze(0)  # Shape: (1, 1, len(X_RANGE))
-        wie = wie.unsqueeze(0).unsqueeze(0)
-        wei = wei.unsqueeze(0).unsqueeze(0)
-        wii = wii.unsqueeze(0).unsqueeze(0)
+        # make_kernel already returns shape (out_channels=1, in_channels=1, kernel_len)
+        # ensure kernels are float32, on device and contiguous
+        wee = wee.to(dtype=torch.float32, device=DEVICE).contiguous()
+        wie = wie.to(dtype=torch.float32, device=DEVICE).contiguous()
+        wei = wei.to(dtype=torch.float32, device=DEVICE).contiguous()
+        wii = wii.to(dtype=torch.float32, device=DEVICE).contiguous()
     
     # Initialize first step
     if is_depolarized:
@@ -81,8 +103,8 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
             continue
         elif not is_depolarized and i*DT==2:
             print(i, "2ms")
-            nu_e[i] = np.log(intensity) * boost["exc"] * normal(DISTANCE_RANGE, sigma["ee"])
-            nu_i[i] = np.log(intensity) * boost["inh"] * normal(DISTANCE_RANGE, sigma["ii"])
+            nu_e[i] = np.log(intensity) * boost["exc"] * normal(DISTANCE_RANGE, 120)
+            nu_i[i] = np.log(intensity) * boost["inh"] * normal(DISTANCE_RANGE, 120)
 
         if usingFFT:
             nu_e_fft = torch.fft.fft(nu_e[i])
@@ -114,9 +136,14 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
         
         # Compute maxRadius
         if radius_only:
-            # 0.26 seconds 
             rho_e[i+1] = maxRadius(v_e[i+1], DISTANCE_RANGE, THRESHOLD)
             rho_i[i+1] = maxRadius(v_i[i+1], DISTANCE_RANGE, THRESHOLD)
+
+            if rho_e[i+1] >  rho_i[i+1] and not is_transient:
+                is_transient += 1
+
+            if rho_e[i+1] <  rho_i[i+1] and is_transient == 1:
+                is_transient += 1
         
         if gif:
             plot_tn([v_e[i].cpu().numpy(), v_i[i].cpu().numpy()], i*DT, DISTANCE_RANGE.cpu().numpy())
@@ -128,4 +155,4 @@ def model(intensity, weights, sigma, rate, boost, is_depolarized=True, radius_on
     # Convert results back to numpy arrays
     return (v_e.cpu().numpy(), v_i.cpu().numpy(), 
             rho_e.cpu().numpy(), rho_i.cpu().numpy(), 
-            nu_e.cpu().numpy(), nu_i.cpu().numpy())
+            nu_e.cpu().numpy(), nu_i.cpu().numpy(), is_transient)

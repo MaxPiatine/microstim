@@ -9,9 +9,11 @@ def main():
     global config, is_depol, is_prod
     weights, boost, sigma, typeModel = setup(config, is_depol)
     
-    _, _, rho_e, rho_i, _, _ = model(config["intensity"], weights, sigma, rect, boost, is_depolarized=is_depol, radius_only=True)
+    _, _, rho_e, rho_i, _, _, is_transient = model(config["intensity"], weights, sigma, rect, boost, is_depolarized=is_depol, radius_only=True)
     if is_prod:
-        _, _, no_amp, _, _, _ = model(config["intensity"], config["no_boost_weights"], sigma, rect, config["no_boost"], is_depolarized=is_depol, radius_only=True)
+        _, _, no_amp, _, _, _, _ = model(config["intensity"], config["no_boost_weights"], sigma, rect, config["no_boost"], is_depolarized=is_depol, radius_only=True)
+
+    print(f"the network output is {'transient' if is_transient == 2 else 'unstable' if is_transient == 1 else 'stable'}")
 
     sns.set_theme(style="ticks")
     palette = sns.color_palette("rocket_r", n_colors=3) 
@@ -29,6 +31,8 @@ def main():
     plt.ylabel(r"Radius [$\mu$m]")
     plt.title(r"$\Delta t$ = " + str(DT) + " ms")
     plt.legend(loc="best")
+
+    # plt.xlim(1.999, 2.01)
 
     if is_prod:
         plt.savefig(f"results/{typeModel}/svg/radii.svg", format="svg", bbox_inches="tight")
