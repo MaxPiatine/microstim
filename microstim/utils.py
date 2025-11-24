@@ -20,6 +20,7 @@ MU_E = config['MU_E']
 MU_I = config['MU_I']
 STDEV_E = config['STDEV_E']
 STDEV_I = config['STDEV_I']
+DX = config['dx']
 
 def zeros(shape):
     return torch.zeros(shape, dtype=torch.float32, device=DEVICE)
@@ -119,3 +120,15 @@ def plot_tn(responses, time, distance):
     
     plt.close()
     gc.collect()
+
+def make_kernel(sigma_val, weight_val):
+        # radius in samples (at spatial resolution DX)
+        radius_samples = max(1, int(np.ceil((5 * sigma_val) / DX)))
+        # create coordinates in micrometers sampled at DX
+        x = torch.linspace(-radius_samples * DX, radius_samples * DX,
+                           2 * radius_samples + 1, dtype=torch.float32, device=DEVICE)
+        k = normal(x, sigma_val)  # expected to return torch tensor
+        k = k / k.sum()           # normalize kernel area to 1
+        k = k * weight_val        # scale by synaptic weight
+        # ensure odd kernel length so 'same' padding is symmetric
+        return k.unsqueeze(0).unsqueeze(0)  # shape (1,1,klen)

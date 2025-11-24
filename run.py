@@ -2,7 +2,6 @@ import argparse
 import importlib
 import yaml
 import sys
-import seaborn as sns
 
 # Load config.yaml
 with open("config.yaml", "r") as f:
@@ -11,7 +10,6 @@ with open("config.yaml", "r") as f:
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description="Run microstim cell/axon functions")
 parser.add_argument("function", help="Function to run (e.g. heatmap, radii, maxpotDistance)")
-parser.add_argument("--is_depol", action="store_true", help="Use depolarization model")
 parser.add_argument("--is_prod", action="store_true", help="Production mode")
 parser.add_argument("--position", type=int, default=250, help="Position index (default: 250 microns)")
 args = parser.parse_args()
@@ -48,7 +46,6 @@ module = importlib.import_module(module_path)
 
 # config and flags as globals in the module
 setattr(module, "config", config)
-setattr(module, "is_depol", args.is_depol)
 setattr(module, "is_prod", args.is_prod)
 setattr(module, "position", args.position)
 
