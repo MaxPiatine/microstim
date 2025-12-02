@@ -40,38 +40,41 @@ fits = {
 
 def t_o(intensity, rate, boost):
     fit = fits[intensity]
-    nu_e, nu_i = zeros((N, L)), zeros((N, L)) # firing rates
-    v_e, v_i = zeros((N, L)), zeros((N, L)) # membrane potentials
+    nu_e, nu_i = zeros(L), zeros(L) # firing rates
+    v_e, v_i = zeros(L), zeros(L) # membrane potentials
     
-    v_e[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["exc"] * boost["exc"] 
-    v_i[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["inh"] * boost["inh"] 
+    v_e = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["exc"] * boost["exc"] 
+    v_i = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["inh"] * boost["inh"] 
+
+    # v_e *= normal(DISTANCE_RANGE, 113)
+    # v_i *= normal(DISTANCE_RANGE, 113)
 
     x0_exc = np.sqrt(R*intensity * d_axon["exc"] * boost["exc"]/THRESHOLD) - ALPHA
     x0_inh = np.sqrt(R*intensity * d_axon["inh"] * boost["inh"]/THRESHOLD) - ALPHA
     print("Pyr")
-    nu_e[0] = torch.tensor(rate(DISTANCE_RANGE.cpu().numpy(), x0_exc, 0.064))
+    nu_e = torch.tensor(rate(DISTANCE_RANGE.cpu().numpy(), x0_exc, 0.064))
     print("PV")
-    nu_i[0] = torch.tensor(rate(DISTANCE_RANGE.cpu().numpy(), x0_inh, 0.112))
+    nu_i = torch.tensor(rate(DISTANCE_RANGE.cpu().numpy(), x0_inh, 0.112))
 
     fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(11, 20))
     axes = axes.flatten()  # make indexing easier
 
     fit_exc = fit["exc"]
-    axes[0].plot(DISTANCE_RANGE.cpu().numpy(), np.clip(v_e[0].cpu().numpy(), 0, 20), label="exc")
-    axes[0].plot(DISTANCE_RANGE.cpu().numpy(), nu_e[0].cpu().numpy(), label="exc rate")
+    axes[0].plot(DISTANCE_RANGE.cpu().numpy(), np.clip(v_e.cpu().numpy(), 0, 20), label="exc")
+    axes[0].plot(DISTANCE_RANGE.cpu().numpy(), nu_e.cpu().numpy(), label="exc rate")
     axes[0].plot(DISTANCE_RANGE.cpu().numpy(), sigmoid(DISTANCE_RANGE.cpu().numpy(), fit_exc["x0"], fit_exc["k"]), label="exc exp rate")
     axes[0].hlines(THRESHOLD, xmin=0, xmax=X, colors='gray', linestyles='dashed', label="threshold")
     axes[0].vlines(x0_exc, ymin=0, ymax=20, colors='gray', linestyles='dashed', label="x0 exc")
     axes[0].legend()
 
     fit_inh = fit["inh"]
-    axes[1].plot(DISTANCE_RANGE.cpu().numpy(), np.clip(v_i[0].cpu().numpy(),0, 20), label="inh")
-    axes[1].plot(DISTANCE_RANGE.cpu().numpy(), nu_i[0].cpu().numpy(), label="inh rate")
+    axes[1].plot(DISTANCE_RANGE.cpu().numpy(), np.clip(v_i.cpu().numpy(),0, 20), label="inh")
+    axes[1].plot(DISTANCE_RANGE.cpu().numpy(), nu_i.cpu().numpy(), label="inh rate")
     axes[1].plot(DISTANCE_RANGE.cpu().numpy(), sigmoid(DISTANCE_RANGE.cpu().numpy(), fit_inh["x0"], fit_inh["k"]), label="inh exp rate")
     axes[1].hlines(THRESHOLD, xmin=0, xmax=X, colors='gray', linestyles='dashed', label="threshold")
     axes[1].vlines(x0_inh, ymin=0, ymax=20, colors='gray', linestyles='dashed', label="x0 inh")
     axes[1].legend()
-    # plt.show()
+    plt.show()
 
     return v_e, v_i, nu_e, nu_i
 
@@ -81,16 +84,27 @@ if __name__ == "__main__":
     lst = []
     for intensity in intensities:
         print(f"Intensity: {intensity} uA")
-        _, _, nu_e, _ = t_o(intensity, sigmoid, boost)
-        lst.append(nu_e)
+        _, _, nu_e, nu_i = t_o(intensity, sigmoid, boost)
+        lst.append(nu_i)
         print()
 
-    for pos in [50, 100, 250, 750]:
-        fig, ax = plt.subplots()
-        ax.set_xscale('log') 
-        ax.set_title('Logarithmic Axes Example')
-        ax.grid(True, which="both", ls="-") # Add grid for better visualization
-        ax.plot(intensities, lst[:][pos].cpu().numpy(), marker='o')
-        plt.show()
+    positions = [50, 100, 250, 750]     
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.set_xscale('log')
+    # ax.set_title('Intensity vs nu_e at different positions')
+    ax.grid(True, which="both", ls="-")
+ 
+    for pos in positions:
+        pidx = int(round(pos / DX))
+        probs = [row[pidx].cpu().item() for row in lst]  # row is tensor (L,)
+        ax.plot(intensities, probs, marker='o', label=f"{pos} μm")
+
+    ax.set_xlabel("Intensity (µA)")
+    ax.set_ylabel(r"$\nu_i$")
+    ax.legend(title="Distance")
+    ax.set_xticks(intensities)
+    ax.get_xaxis().set_major_formatter(plt.ScalarFormatter())  # nicer log tick labels
+    plt.tight_layout()
+    plt.show()
 
         
