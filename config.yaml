@@ -1,6 +1,6 @@
-N: 12000 #total steps
-dt: 0.001 #ms
-distance: 1500 #micrometers
+N: 100 #total steps
+dt: 1 #ms
+distance: 770 #micrometers
 dx: 0.1 #micrometer
 
 R: 7 #resistance from electrode to neuron
@@ -9,18 +9,22 @@ BETA: 1
 TAU: 10 #ms
 Rm: 1 #membrane resistance
 THRESHOLD: 20 #mV
-intensity: 500 #microamps
+intensity: 100 #microamps
 P: 2 #Power law
+
+d_axon:
+  exc: 100
+  inh: 300
 
 rates:
   exc: 1 #Hz
-  inh: 2 #Hz
+  inh: 1 #Hz
 
 sigmas:
-  ee: 127
-  ie: 96.6
-  ei: 99.84
-  ii: 126.77
+  ee: 113
+  ie: 113
+  ei: 113
+  ii: 113
 
 #Activation init
 act_weights:
@@ -30,8 +34,8 @@ act_weights:
   ii: 150
 
 gamma:
-  exc: 10000
-  inh: 0
+  exc: 1
+  inh: 2
 
 #No boost init
 no_boost_weights:

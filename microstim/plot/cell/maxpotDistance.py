@@ -3,16 +3,16 @@ import seaborn as sns
 import numpy as np
 
 from microstim.main import model, DISTANCE_RANGE
-from microstim.utils import rect
+from microstim.utils import rect, sigmoid
 from microstim.plot.cell.utils import setup
 
 def main():
-    global config, is_depol, is_prod
-    weights, boost, sigma, typeModel = setup(config, is_depol)
+    global config, is_prod
+    weights, boost, sigma = setup(config)
 
-    v_e, v_i, _, _, _, _ = model(config["intensity"], weights, sigma, rect, boost, is_depolarized=is_depol)
+    v_e, v_i, _, _, _, _ = model(config["intensity"], weights, sigma, sigmoid, boost)
     if is_prod:
-        no_amp, _, _, _, _, _ = model(config["intensity"], config["no_boost_weights"], sigma, rect, config["no_boost"], is_depolarized=is_depol)
+        no_amp, _, _, _, _, _ = model(config["intensity"], config["no_boost_weights"], sigma, rect, config["no_boost"])
 
     # Use the Seaborn palette colors
     sns.set_theme(style="ticks")
@@ -31,8 +31,8 @@ def main():
     plt.ylabel("mV")
     plt.legend(loc="best")
 
-    if is_prod:
-        plt.savefig(f"results/{typeModel}/svg/maxpotDistance.svg", format="svg", bbox_inches="tight")
-        plt.savefig(f"results/{typeModel}/maxpotDistance.png", format="png", bbox_inches="tight")
+    # if is_prod:
+    #     plt.savefig(f"results/{typeModel}/svg/maxpotDistance.svg", format="svg", bbox_inches="tight")
+    #     plt.savefig(f"results/{typeModel}/maxpotDistance.png", format="png", bbox_inches="tight")
 
     plt.show()

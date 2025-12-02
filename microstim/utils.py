@@ -22,6 +22,9 @@ STDEV_E = config['STDEV_E']
 STDEV_I = config['STDEV_I']
 DX = config['dx']
 
+def V_eph(x, R, I, alpha):
+    return R*I/(x+alpha)**2
+
 def zeros(shape):
     return torch.zeros(shape, dtype=torch.float32, device=DEVICE)
 
@@ -35,8 +38,9 @@ def maxRadius(v, x_range: torch.Tensor, threshold: int):
     
     # Get the corresponding x_range values
     x_max = torch.where(torch.any(mask), x_range[max_idx], torch.tensor(0.0, device=v.device))
-    
-    return x_max  
+    print(x_max.cpu().item())
+    return x_max.cpu().item()
+
 def gaussian(x, mean, std):
     scale = 1.0 / (std * np.sqrt(2 * np.pi))
     return scale * np.exp(-(x - mean)**2 / (2 * std**2))
@@ -71,8 +75,8 @@ def normal(x, sigma):
     sigma_tensor = torch.tensor(sigma, dtype=torch.float32, device=x.device)
     return torch.exp(-(x)**2/(2 * sigma_tensor**2)) / torch.sqrt(2 * torch.pi * sigma_tensor**2)
     
-def sigmoid(v):
-    return 1 / (1 + np.exp(-(THRESHOLD - v)))
+def sigmoid(x, x0, k):
+    return 1 / (1 + np.exp(k*(x - x0)))
 
 def rect(v):
     return torch.where(v >= THRESHOLD, 1, 0)
@@ -80,7 +84,7 @@ def rect(v):
 def sigmoidalRect(v):
     x = rect(v)
     f = 1
-    for index, step in enumerate(x):
+    for index in enumerate(x):
         try:
             if x[index] == 1 and x[index+1] == 0:
                 f *= 1 / (1 + np.exp(-x + index/len(x)))
