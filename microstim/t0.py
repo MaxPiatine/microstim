@@ -48,6 +48,8 @@ def t_o(intensity, rate, boost):
 
     # v_e *= normal(DISTANCE_RANGE, 113)
     # v_i *= normal(DISTANCE_RANGE, 113)
+    # x0_exc = maxRadius(v_e, DISTANCE_RANGE, THRESHOLD)
+    # x0_inh = maxRadius(v_i, DISTANCE_RANGE, THRESHOLD)
 
     x0_exc = np.sqrt(R*intensity * d_axon["exc"] * boost["exc"]/THRESHOLD) - ALPHA
     x0_inh = np.sqrt(R*intensity * d_axon["inh"] * boost["inh"]/THRESHOLD) - ALPHA

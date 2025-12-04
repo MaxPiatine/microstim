@@ -2,18 +2,16 @@ import matplotlib.pylab as plt
 import seaborn as sns
 
 from microstim.main import model, DT
-from microstim.utils import rect
+from microstim.utils import sigmoid
 from microstim.plot.cell.utils import setup, TIME_RANGE
 
 def main():
     global config, is_prod
     weights, boost, sigma = setup(config)
     
-    _, _, rho_e, rho_i, _, _, is_transient = model(config["intensity"], weights, sigma, rect, boost, radius_only=True)
+    _, _, rho_e, rho_i, _, _ = model(config["intensity"], weights, sigma, sigmoid, boost, radius_only=True)
     if is_prod:
-        _, _, no_amp, _, _, _, _ = model(config["intensity"], config["no_boost_weights"], sigma, rect, config["no_boost"], radius_only=True)
-
-    print(f"the network output is {'transient' if is_transient == 2 else 'unstable' if is_transient == 1 else 'stable'}")
+        _, _, no_amp, _, _, _ = model(config["intensity"], config["no_boost_weights"], sigma, sigmoid, config["no_boost"], radius_only=True)
 
     sns.set_theme(style="ticks")
     palette = sns.color_palette("rocket_r", n_colors=3) 

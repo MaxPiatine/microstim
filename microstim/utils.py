@@ -28,6 +28,34 @@ def V_eph(x, R, I, alpha):
 def zeros(shape):
     return torch.zeros(shape, dtype=torch.float32, device=DEVICE)
 
+def slope(x, v, x0):
+    if x0-1 <= 0:
+        dx = torch.abs(x[x0+2] - x[x0])
+        return (v[x0]-v[x0+2])/dx
+    elif x0+1 >= len(v):
+        dx = torch.abs(x[x0] - x[x0-2])
+        return (v[x0-2]-v[x0])/dx
+    dx = torch.abs(x[x0-1] - x[x0+1])
+    return (v[x0-1]-v[x0+1])/dx
+
+def x0s(v):
+    mask = v >= 20.0
+    diff = mask[1:].int() - mask[:-1].int()
+
+    starts = torch.where(diff == 1)[0] + 1
+    ends   = torch.where(diff == -1)[0]
+
+    # Handle edge cases
+    if mask[0]:
+        starts = torch.cat([torch.tensor([0], device=v.device), starts])
+    if mask[-1]:
+        ends = torch.cat([ends, torch.tensor([len(v) - 1], device=v.device)])
+
+    # Combine into one (N, 2) tensor
+    runs = torch.stack([starts, ends], dim=1)
+
+    return runs
+
 @torch.jit.script
 def maxRadius(v, x_range: torch.Tensor, threshold: int):
     # Find the last index where value > threshold
@@ -38,8 +66,7 @@ def maxRadius(v, x_range: torch.Tensor, threshold: int):
     
     # Get the corresponding x_range values
     x_max = torch.where(torch.any(mask), x_range[max_idx], torch.tensor(0.0, device=v.device))
-    print(x_max.cpu().item())
-    return x_max.cpu().item()
+    return x_max
 
 def gaussian(x, mean, std):
     scale = 1.0 / (std * np.sqrt(2 * np.pi))
@@ -75,8 +102,24 @@ def normal(x, sigma):
     sigma_tensor = torch.tensor(sigma, dtype=torch.float32, device=x.device)
     return torch.exp(-(x)**2/(2 * sigma_tensor**2)) / torch.sqrt(2 * torch.pi * sigma_tensor**2)
     
-def sigmoid(x, x0, k):
-    return 1 / (1 + np.exp(k*(x - x0)))
+def sigmoid(x, v, x0s):
+    nu = torch.zeros_like(x)
+    for x0 in x0s:
+        tmp = torch.ones_like(x)
+        if x0[0] == x0[1]:
+            x0 = int(x0[0])
+            tmp *= torch.sigmoid(-slope(x, v, x0) * (x - x[x0]))
+        else:
+            x0_start, x0_end = int(x0[0]), int(x0[1])
+
+            if x0_start != 0:    
+                start = slope(x, v, x0_start)
+                tmp *= torch.sigmoid(-start * (x - x[x0_start]))
+
+            end = slope(x, v, x0_end)
+            tmp *= torch.sigmoid(-end * (x - x[x0_end]))
+        nu += tmp
+    return nu
 
 def rect(v):
     return torch.where(v >= THRESHOLD, 1, 0)

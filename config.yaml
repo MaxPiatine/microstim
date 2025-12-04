@@ -34,8 +34,8 @@ act_weights:
   ii: 150
 
 gamma:
-  exc: 1
-  inh: 2
+  exc: 10
+  inh: 30
 
 #No boost init
 no_boost_weights:

@@ -3,12 +3,16 @@ research/
 machine/
 code/
 
-results/axon/svg/
-results/Histed/svg/
-results/Stoney/svg/
+results/Stoney/
+results/master/
+results/unstable/
+results/new/
 
 *svg*
 *npz*
 *npy*
 *pyc*
+*xlsx*
 *.DS_Store
+__pycache__/
+.venv/
