@@ -9,7 +9,7 @@ from microstim.utils import maxRadius, normal, plot_tn, zeros, make_kernel, V_ep
 import matplotlib.pylab as plt
 
 usingFFT = False
-gif = False
+gif = True
 
 N = config["N"]
 X = config["distance"]
@@ -113,7 +113,8 @@ def model(intensity, weights, sigma, rate, boost, radius_only=False):
 
 
         if gif:
-            plot_tn([v_e[i].cpu().numpy(), v_i[i].cpu().numpy()], i*DT, DISTANCE_RANGE.cpu().numpy())
+            plot_tn([v_i[i].cpu().numpy(), nu_i[i].cpu().numpy()], i*DT, DISTANCE_RANGE.cpu().numpy())
+            
         
 
     end = time.time()

@@ -155,14 +155,16 @@ def plot_tn(responses, time, distance):
     plt.xlabel("Distance (μm)")
     plt.ylabel("Relative Voltage mV")
 
+    plt.ylim(-0.5, 20.5)
     ax.hlines(20, 0 , max(distance), color="k", linestyles='-.')
+    ax.hlines(0, 0 , max(distance), color="k", linestyles='-.')
     plt.plot(distance, responses[0], color=palette[1], label=r"$V_e$")
-    plt.plot(distance, responses[1], color=palette[2], label=r"$V_i$")
+    plt.plot(distance, responses[1], color="blue", label=r"$\nu_e$")
+    # plt.plot(distance, responses[1], color=palette[2], label=r"$V_i$")
 
     f.tight_layout()
     
     save_name = "./microstim/plot/results/"+str(time)+"plot.png"
-    
     plt.savefig(save_name, transparent=True)
     
     plt.close()
