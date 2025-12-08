@@ -56,6 +56,22 @@ def x0s(v):
 
     return runs
 
+def classify_behavior(rho_i, rho_e):
+    mask = rho_i > rho_e
+    
+    diff = mask[1:].int() - mask[:-1].int()  # +1 or -1 when flips occur
+
+    flips = torch.count_nonzero(diff != 0).item()
+
+    if flips == 0:
+        return "stable"
+    elif flips == 1:
+        return "unstable"
+    elif flips == 2:
+        return "transient"
+    else:
+        return f"unclassified ({flips} flips)"
+
 @torch.jit.script
 def maxRadius(v, x_range: torch.Tensor, threshold: int):
     # Find the last index where value > threshold
@@ -151,7 +167,7 @@ def plot_tn(responses, time, distance):
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
-    plt.title("time "+str(time)+" ms")
+    plt.title(f"time {time:.2f} ms")
     plt.xlabel("Distance (μm)")
     plt.ylabel("Relative Voltage mV")
 
@@ -159,8 +175,9 @@ def plot_tn(responses, time, distance):
     ax.hlines(20, 0 , max(distance), color="k", linestyles='-.')
     ax.hlines(0, 0 , max(distance), color="k", linestyles='-.')
     plt.plot(distance, responses[0], color=palette[1], label=r"$V_e$")
-    plt.plot(distance, responses[1], color="blue", label=r"$\nu_e$")
-    # plt.plot(distance, responses[1], color=palette[2], label=r"$V_i$")
+    # plt.plot(distance, responses[1], color="blue", label=r"$\nu_i$")
+    plt.plot(distance, responses[1], color=palette[2], label=r"$V_i$")
+    plt.legend(loc="best")
 
     f.tight_layout()
     

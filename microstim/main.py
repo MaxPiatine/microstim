@@ -2,14 +2,19 @@ import torch.nn.functional as F
 import torch
 import numpy as np
 import time
+import glob
+import os
+import matplotlib.animation as animation
+from PIL import Image
+from datetime import datetime
+import json
+import gc
 
-from microstim.config import config, DEVICE
-from microstim.utils import maxRadius, normal, plot_tn, zeros, make_kernel, V_eph, x0s
+from microstim.config import config, DEVICE, current_dir
+from microstim.utils import maxRadius, normal, plot_tn, zeros, make_kernel, V_eph, x0s, classify_behavior
+from microstim.logging import log_run
 
 import matplotlib.pylab as plt
-
-usingFFT = False
-gif = True
 
 N = config["N"]
 X = config["distance"]
@@ -26,10 +31,8 @@ THRESHOLD = config["THRESHOLD"]
 DISTANCE_RANGE = torch.tensor(np.arange(0, X, DX), dtype=torch.float32, device=DEVICE)
 L = DISTANCE_RANGE.shape[0]
 
-def model(intensity, weights, sigma, rate, boost, radius_only=False):
+def model(intensity, weights, sigma, rate, boost, radius_only=False, is_gif=False):
     start = time.time()
-
-    rho_e, rho_i = zeros(N), zeros(N) # radii
     nu_e, nu_i = zeros((N, L)), zeros((N, L)) # firing rates
     v_e, v_i = zeros((N, L)), zeros((N, L)) # membrane potentials
     
@@ -41,27 +44,16 @@ def model(intensity, weights, sigma, rate, boost, radius_only=False):
     v_e[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["exc"] * boost["exc"] 
     v_i[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["inh"] * boost["inh"]
 
-    v_e[0] *= normal(DISTANCE_RANGE, 113)
-    v_i[0] *= normal(DISTANCE_RANGE, 113)
+    # v_e[0] *= normal(DISTANCE_RANGE, 113)
+    # v_i[0] *= normal(DISTANCE_RANGE, 113)
 
     nu_e[0] = rate(DISTANCE_RANGE, v_e[0], x0s(v_e[0]))
     nu_i[0] = rate(DISTANCE_RANGE, v_i[0], x0s(v_i[0]))
 
-    # fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(11, 20))
-    # axes = axes.flatten()  # make indexing easier
-
-    # axes[0].plot(DISTANCE_RANGE.cpu().numpy(), np.clip(v_e[0].cpu().numpy(), 0, 20), label="exc")
-    # axes[0].plot(DISTANCE_RANGE.cpu().numpy(), nu_e[0].cpu().numpy(), label="exc rate")
-    # # axes[0].plot(DISTANCE_RANGE.cpu().numpy(), sigmoid(DISTANCE_RANGE.cpu().numpy(), 75, 0.064), label="exc exp rate")
-    # axes[0].hlines(THRESHOLD, xmin=0, xmax=X, colors='gray', linestyles='dashed', label="threshold")
-    # axes[0].legend()
-
-    # axes[1].plot(DISTANCE_RANGE.cpu().numpy(), np.clip(v_i[0].cpu().numpy(),0, 20), label="inh")
-    # axes[1].plot(DISTANCE_RANGE.cpu().numpy(), nu_i[0].cpu().numpy(), label="inh rate")
-    # # axes[1].plot(DISTANCE_RANGE.cpu().numpy(), sigmoid(DISTANCE_RANGE.cpu().numpy(), 243.3, 0.112), label="inh exp rate")
-    # axes[1].hlines(THRESHOLD, xmin=0, xmax=X, colors='gray', linestyles='dashed', label="threshold")
-    # plt.legend()
-    # plt.show()
+    if radius_only:
+        rho_e, rho_i = zeros(N), zeros(N) # radii
+        rho_e[0] = maxRadius(v_e[0], DISTANCE_RANGE, THRESHOLD)
+        rho_i[0] = maxRadius(v_i[0], DISTANCE_RANGE, THRESHOLD)
 
     for i in range(N-1):
         if i / 100 == 1.0:
@@ -88,39 +80,82 @@ def model(intensity, weights, sigma, rate, boost, radius_only=False):
         if radius_only:
             rho_e[i+1] = maxRadius(v_e[i+1], DISTANCE_RANGE, THRESHOLD)
             rho_i[i+1] = maxRadius(v_i[i+1], DISTANCE_RANGE, THRESHOLD)
-            
+
             if rho_e[i+1] == 0 and rho_i[i] == 0:
                 print("break pad")
                 break
 
-        # fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(11, 20))
-        # axes = axes.flatten()  # make indexing easier
+        if is_gif:
+            plot_tn([v_e[i].cpu().numpy(), v_i[i].cpu().numpy()], i*DT, DISTANCE_RANGE.cpu().numpy())
+            plt.close("all")
 
-        # axes[0].plot(DISTANCE_RANGE.cpu().numpy(), np.clip(v_e[i+1].cpu().numpy(), 0, 20), label="exc")
-        # axes[0].plot(DISTANCE_RANGE.cpu().numpy(), nu_e[i+1].cpu().numpy(), label="exc rate")
-        # # axes[0].plot(DISTANCE_RANGE.cpu().numpy(), sigmoid(DISTANCE_RANGE.cpu().numpy(), 75, 0.064), label="exc exp rate")
-        # axes[0].hlines(THRESHOLD, xmin=0, xmax=X, colors='gray', linestyles='dashed', label="threshold")
-        # # axes[0].vlines(x0_exc.cpu().numpy(), ymin=0, ymax=THRESHOLD, colors='gray', linestyles='dashed', label="x0") 
-        # axes[0].legend()
-
-        # axes[1].plot(DISTANCE_RANGE.cpu().numpy(), np.clip(v_i[i+1].cpu().numpy(),0, 20), label="inh")
-        # axes[1].plot(DISTANCE_RANGE.cpu().numpy(), nu_i[i+1].cpu().numpy(), label="inh rate")
-        # # axes[1].plot(DISTANCE_RANGE.cpu().numpy(), sigmoid(DISTANCE_RANGE.cpu().numpy(), 243.3, 0.112), label="inh exp rate")
-        # axes[1].hlines(THRESHOLD, xmin=0, xmax=X, colors='gray', linestyles='dashed', label="threshold")
-        # # axes[1].vlines(x0_inh, ymin=0, ymax=THRESHOLD, colors='gray', linestyles='dashed', label="x0")
-        # plt.legend()
-        # plt.show()
-
-
-        if gif:
-            plot_tn([v_i[i].cpu().numpy(), nu_i[i].cpu().numpy()], i*DT, DISTANCE_RANGE.cpu().numpy())
+        try:
+            del conv_wee, conv_wie, conv_wei, conv_wii, nu_e_current, nu_i_current
+        except NameError:
+            pass
             
-        
 
     end = time.time()
     print(f"Total time: {end - start} seconds")
 
-    # Convert results back to numpy arrays
-    return (v_e.cpu().numpy(), v_i.cpu().numpy(), 
-            rho_e.cpu().numpy(), rho_i.cpu().numpy(), 
-            nu_e.cpu().numpy(), nu_i.cpu().numpy())
+    if is_gif:
+        files_path = current_dir + "/plot/results/"
+        files = sorted(glob.glob("./microstim/plot/results/*.png"), key=os.path.getmtime)
+        images = [np.array(Image.open(file)) for file in files]
+        os.makedirs("results", exist_ok=True)
+
+        fig, ax = plt.subplots()
+        im = ax.imshow(images[0], animated=True)
+        plt.axis("off") 
+
+        def update(i):
+            im.set_array(images[i])
+            return [im]
+
+        # Create the animation
+        animated = animation.FuncAnimation(
+            fig, update, frames=len(images), interval=150, blit=True, repeat_delay=10
+        )
+
+        animated.save(f"results/new/{datetime.now().strftime("%Y-%m-%dT%H:%M:%S")}.gif", writer="pillow", fps=30)
+            
+        list(map(os.remove, glob.glob(os.path.join(files_path, "*.png"))))
+
+    v_e_np = v_e.cpu().numpy()
+    v_i_np = v_i.cpu().numpy()
+    nu_e_np = nu_e.cpu().numpy()
+    nu_i_np = nu_i.cpu().numpy()
+    rho_e_np = rho_e.cpu().numpy() if radius_only else None
+    rho_i_np = rho_i.cpu().numpy() if radius_only else None
+
+    # logging 
+    stats = {
+        "total_time": end - start,
+        "transient": classify_behavior(rho_i, rho_e) if radius_only else None,
+        "max_rho_e": float(torch.max(rho_e).cpu().numpy()) if radius_only else None,
+        "max_rho_i": float(torch.max(rho_i).cpu().numpy()) if radius_only else None,
+        "weights": json.dumps(weights),
+        "sigmas": json.dumps(sigma),
+        "boosts": json.dumps(boost),
+    }
+    log_run(config, stats=stats)
+
+
+    try:
+        del v_e, v_i, nu_e, nu_i, rho_e, rho_i
+        del wee, wie, wei, wii
+    except NameError:
+        pass
+
+    plt.close('all')
+
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    elif hasattr(torch, "mps"):
+        try:
+            torch.mps.empty_cache()
+        except Exception:
+            pass
+    
+    return (v_e_np, v_i_np, rho_e_np, rho_i_np, nu_e_np, nu_i_np)

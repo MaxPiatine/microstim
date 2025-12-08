@@ -1,42 +1,57 @@
 import matplotlib.pylab as plt
 import numpy as np
+import torch
 
 from matplotlib import cm
 from microstim.main import model
-from microstim.utils import rect
+from microstim.utils import rect, sigmoid
 from microstim.plot.cell.utils import setup
+from microstim.logging import _timestamp
 
 def main():
-    global config, is_depol, is_prod
-    weights, boost, sigma, typeModel = setup(config, is_depol)
+    global config, is_prod
+    weights, boost, sigma = setup(config)
 
-    Wei_RANGE = np.linspace(300, 900, 10)
-    inh_RANGE = np.linspace(100, 600, 10)
-    heatmap = np.zeros((len(Wei_RANGE), len(inh_RANGE)))
+    Wee_RANGE = np.linspace(300, 1000, 10)
+    Wie_RANGE = np.linspace(200, 600, 10)
+    heatmap = np.zeros((len(Wee_RANGE), len(Wie_RANGE)))
 
-    for y, W_ei in enumerate(Wei_RANGE):
-        weights["ie"] = W_ei # changing from i->e
-        for x, direct_inh in enumerate(inh_RANGE):
-            print(y, ": ", x)
-            boost["inh"] = direct_inh
-            _, _, rho_e, _, _, _ = model(config["intensity"], weights, sigma, rect, boost, is_depolarized=is_depol, radius_only=True)
+    for y, W_ee in enumerate(Wee_RANGE):
+        weights["ee"] = W_ee 
+        for x, W_ie in enumerate(Wie_RANGE):
+            print(f"Wee: {W_ee:.2f}, Wie: {W_ie:.2f}")
+            weights["ie"] = W_ie
+            _, _, rho_e, _, _, _ = model(config["intensity"], weights, sigma, sigmoid, boost, radius_only=True, is_gif=True)
             heatmap[x][y] += max(rho_e)
+
+            # free large tensors and cached GPU/MPS memory
+            del rho_e
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            elif hasattr(torch, "mps"):
+                try:
+                    torch.mps.empty_cache()
+                except Exception:
+                    pass
+
+           # close any figures created during this iteration
+            plt.close('all')
 
 
     
     fig = plt.figure(num=8,figsize = (4.5,3), facecolor = 'w', dpi = 150, edgecolor = 'w')
     fig.clf()
     ax = plt.axes([0.15, 0.18, 0.8, 0.8])
-    ax.set_xlabel("inh rate")
-    ax.set_ylabel(r"$w_{ie}$")
+    ax.set_xlabel(r"$W_{ie}$")
+    ax.set_ylabel(r"$w_{ee}$")
     
-    cs = ax.contourf(inh_RANGE, Wei_RANGE, heatmap.T, cmap=cm.PuBu_r, vmin=0, vmax=1500, levels=10)
+    cs = ax.contourf(Wie_RANGE, Wee_RANGE, heatmap.T, cmap=cm.PuBu_r, vmin=0, vmax=800, levels=10)
     fig.colorbar(cs)
     # ax.invert_yaxis()
 
-    if is_prod:
-        plt.savefig(f"results/{typeModel}/svg/heatmap.svg", format="svg", bbox_inches="tight")
-        plt.savefig(f"results/{typeModel}/heatmap.png", format="png", bbox_inches="tight")
+    np.save(f"results/new/data/heatmap_{_timestamp()}.npy", heatmap)
+    plt.savefig(f"results/new/svg/heatmap_{_timestamp()}.svg", format="svg", bbox_inches="tight")
+    plt.savefig(f"results/new/heatmap_{_timestamp()}.png", format="png", bbox_inches="tight")
 
     plt.show()
 

@@ -10,7 +10,7 @@ def main():
     global config, is_prod
     weights, boost, sigma = setup(config)
 
-    v_e, v_i, _, _, _, _ = model(config["intensity"], weights, sigma, sigmoid, boost)
+    v_e, v_i, _, _, _, _ = model(config["intensity"], weights, sigma, sigmoid, boost, is_gif=True)
     if is_prod:
         no_amp, _, _, _, _, _ = model(config["intensity"], config["no_boost_weights"], sigma, rect, config["no_boost"])
 

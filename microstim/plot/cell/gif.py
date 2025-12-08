@@ -16,7 +16,7 @@ def main():
     global config, is_prod
     weights, boost, sigma = setup(config)
     
-    v_e, v_i, rho_e, rho_i, nu_e, nu_i = model(config["intensity"], weights, sigma, sigmoid, boost)
+    _, _, _, _, _, _ = model(config["intensity"], weights, sigma, sigmoid, boost)
 
     files = sorted(glob.glob("./microstim/plot/results/*.png"), key=os.path.getmtime)
     images = [np.array(Image.open(file)) for file in files]
