@@ -17,10 +17,10 @@ def main():
     heatmap = np.zeros((len(Wee_RANGE), len(Wie_RANGE)))
 
     for y, W_ee in enumerate(Wee_RANGE):
-        weights["ee"] = W_ee 
+        weights["ee"] = round(W_ee, 2)
         for x, W_ie in enumerate(Wie_RANGE):
             print(f"Wee: {W_ee:.2f}, Wie: {W_ie:.2f}")
-            weights["ie"] = W_ie
+            weights["ie"] = round(W_ie, 2)
             _, _, rho_e, _, _, _ = model(config["intensity"], weights, sigma, sigmoid, boost, radius_only=True, is_gif=True)
             heatmap[x][y] += max(rho_e)
 

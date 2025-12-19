@@ -10,36 +10,14 @@ def _timestamp():
     return datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 def log_run(config, stats=None, filename_prefix="run"):
-    """
-    Save full run JSON and append a CSV summary line.
-
-    - config: dict (your config.yaml loaded to microstim.config.config)
-    - is_transient: int (0 stable, 1 unstable, 2 transient) or bool-like
-    - stats: optional dict with numeric summaries (total_time, max_rho_e, ...)
-    """
-    stats = stats or {}
-    ts = _timestamp()
-    json_name = f"{filename_prefix}_{ts}.json"
-    json_path = os.path.join(LOG_DIR, json_name)
-
-    payload = {
-        "timestamp": ts,
-        "config": config,
-        "stats": stats
-    }
-
-    # write full json
-    with open(json_path, "w") as f:
-        json.dump(payload, f, indent=2, default=str)
-
-    # append summary CSV
     csv_path = os.path.join(LOG_DIR, "runs.csv")
-    header = ["timestamp", "total_time", "transient", "weights", "sigmas", "boosts", "max_rho_e", "max_rho_i", "config_json"]
+    header = ["timestamp", "total_time", "transient", "intensity", "weights", "sigmas", "boosts", "max_rho_e", "max_rho_i", "config_json"]
 
     row = {
-        "timestamp": ts,
+        "timestamp": _timestamp(),
         "total_time": stats.get("total_time", ""),
         "transient": stats.get("transient", ""),
+        "intensity": stats.get("intensity", ""),
         "weights": stats.get("weights", ""),
         "sigmas": stats.get("sigmas", ""),
         "boosts": stats.get("boosts", ""),
@@ -55,4 +33,4 @@ def log_run(config, stats=None, filename_prefix="run"):
             writer.writeheader()
         writer.writerow(row)
 
-    return json_path, csv_path
+    return csv_path

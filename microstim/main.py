@@ -41,14 +41,14 @@ def model(intensity, weights, sigma, rate, boost, radius_only=False, is_gif=Fals
     wei = make_kernel(sigma["ei"], weights["ei"]).to(dtype=torch.float32, device=DEVICE).contiguous()
     wii = make_kernel(sigma["ii"], weights["ii"]).to(dtype=torch.float32, device=DEVICE).contiguous()
 
-    v_e[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["exc"] * boost["exc"] 
-    v_i[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["inh"] * boost["inh"]
+    # v_e[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["exc"] * boost["exc"] 
+    # v_i[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["inh"] * boost["inh"]
 
     # v_e[0] *= normal(DISTANCE_RANGE, 113)
     # v_i[0] *= normal(DISTANCE_RANGE, 113)
 
-    nu_e[0] = rate(DISTANCE_RANGE, v_e[0], x0s(v_e[0]))
-    nu_i[0] = rate(DISTANCE_RANGE, v_i[0], x0s(v_i[0]))
+    nu_e[0] = torch.exp(-DISTANCE_RANGE**2/2/(150+0.2*intensity**2))
+    nu_i[0] = torch.exp(-DISTANCE_RANGE**2/2/(100+0.2*intensity**2))
 
     if radius_only:
         rho_e, rho_i = zeros(N), zeros(N) # radii
@@ -130,8 +130,9 @@ def model(intensity, weights, sigma, rate, boost, radius_only=False, is_gif=Fals
 
     # logging 
     stats = {
-        "total_time": end - start,
+        "total_time": round(end - start, 2),
         "transient": classify_behavior(rho_i, rho_e) if radius_only else None,
+        "intensity": int(intensity),
         "max_rho_e": float(torch.max(rho_e).cpu().numpy()) if radius_only else None,
         "max_rho_i": float(torch.max(rho_i).cpu().numpy()) if radius_only else None,
         "weights": json.dumps(weights),

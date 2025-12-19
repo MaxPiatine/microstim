@@ -26,6 +26,7 @@ functions = {
     "maxpotPosition": "microstim.plot.cell.maxpotPosition",
     "maxpotDistance": "microstim.plot.cell.maxpotDistance",
     "weightsHeatmap": "microstim.plot.cell.weightsHeatmap",
+    "probIntensity": "microstim.plot.cell.probIntensity",
 
     "ratios": "microstim.plot.axon.ratios",
     "distributions": "microstim.plot.axon.distributions",

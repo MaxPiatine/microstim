@@ -3,7 +3,7 @@ from microstim.main import N, DT
 
 def setup(config):
     boost = config["gamma"].copy()
-    weights = config["act_weights"].copy()
+    weights = config["weights"].copy()
     sigma = config["sigmas"].copy()
     return weights, boost, sigma
 

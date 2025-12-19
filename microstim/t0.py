@@ -43,16 +43,17 @@ def t_o(intensity, rate, boost):
     nu_e, nu_i = zeros(L), zeros(L) # firing rates
     v_e, v_i = zeros(L), zeros(L) # membrane potentials
     
-    v_e = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["exc"] * boost["exc"] 
-    v_i = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["inh"] * boost["inh"] 
+    # v_e = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["exc"] * boost["exc"] 
+    # v_i = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["inh"] * boost["inh"] 
 
     # v_e *= normal(DISTANCE_RANGE, 113)
     # v_i *= normal(DISTANCE_RANGE, 113)
     # x0_exc = maxRadius(v_e, DISTANCE_RANGE, THRESHOLD)
     # x0_inh = maxRadius(v_i, DISTANCE_RANGE, THRESHOLD)
     
-    nu_e = torch.tensor(rate(DISTANCE_RANGE, v_e, x0s(v_e)))
-    nu_i = torch.tensor(rate(DISTANCE_RANGE, v_i, x0s(v_i)))
+
+    nu_e= torch.exp(-DISTANCE_RANGE**2/2/(50+0.2*intensity**2))
+    nu_i = torch.exp(-DISTANCE_RANGE**2/2/(100+0.2*intensity**2))
 
 
     return v_e, v_i, nu_e, nu_i
