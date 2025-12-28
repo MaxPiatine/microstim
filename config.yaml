@@ -13,8 +13,8 @@ intensity: 200 #microamps
 P: 2 #Power law
 
 d_axon:
-  exc: 100
-  inh: 300
+  exc: 200
+  inh: 200
 
 rates:
   exc: 1 #Hz
@@ -29,7 +29,7 @@ sigmas:
 #Activation init
 weights:
   ee: 500
-  ie: 200
+  ie: 300
   ei: 400
   ii: 150
 

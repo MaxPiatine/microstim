@@ -41,14 +41,14 @@ def model(intensity, weights, sigma, rate, boost, radius_only=False, is_gif=Fals
     wei = make_kernel(sigma["ei"], weights["ei"]).to(dtype=torch.float32, device=DEVICE).contiguous()
     wii = make_kernel(sigma["ii"], weights["ii"]).to(dtype=torch.float32, device=DEVICE).contiguous()
 
-    # v_e[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["exc"] * boost["exc"] 
-    # v_i[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["inh"] * boost["inh"]
+    v_e[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["exc"] * boost["exc"] 
+    v_i[0] = V_eph(DISTANCE_RANGE, R, intensity, ALPHA) * d_axon["inh"] * boost["inh"]
 
     # v_e[0] *= normal(DISTANCE_RANGE, 113)
     # v_i[0] *= normal(DISTANCE_RANGE, 113)
 
-    nu_e[0] = torch.exp(-DISTANCE_RANGE**2/2/(150+0.2*intensity**2))
-    nu_i[0] = torch.exp(-DISTANCE_RANGE**2/2/(100+0.2*intensity**2))
+    nu_e[0] = torch.exp(-DISTANCE_RANGE**2/(100+(1*intensity)**(2/(P+2))))
+    nu_i[0] = torch.exp(-DISTANCE_RANGE**2/(100+(0.2*intensity)**(2/(P+2))))
 
     if radius_only:
         rho_e, rho_i = zeros(N), zeros(N) # radii
